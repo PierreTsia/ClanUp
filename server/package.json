@@ -415,7 +415,7 @@
   },
   "scripts": {
     "server": "nodemon server.js",
-    "client": "cd .. && cd client && npm run serve",
+    "client": "cd .. && cd client && yarn serve",
     "dev": "concurrently --names \"server,client\" \"npm run server --silent\" \"npm run client --silent\""
   },
   "author": "",

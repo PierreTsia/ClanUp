@@ -1,16 +1,13 @@
 <template>
-  <v-container>
-    <v-layout text-center wrap>
-      test
-    </v-layout>
-  </v-container>
+  <HelloWorld />
 </template>
 
-<script lang="ts">
-import Vue from "vue";
+<script>
+import HelloWorld from '../components/HelloWorld';
 
-export default Vue.extend({
-  name: "Home",
-  components: {}
-});
+export default {
+  components: {
+    HelloWorld,
+  },
+};
 </script>
