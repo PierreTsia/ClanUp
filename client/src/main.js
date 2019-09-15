@@ -7,6 +7,8 @@ import ApolloClient from "apollo-boost";
 import VueApollo from "vue-apollo";
 import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
+import * as types from "./store/mutation-types";
+
 
 Vue.use(VueApollo);
 
@@ -34,8 +36,9 @@ export const defaultClient = new ApolloClient({
       for (let err of graphQLErrors) {
         console.dir(err);
         if (err.name === "AuthenticationError") {
+         console.warn(err)
           store.commit(types.SET_AUTH_ERROR, err);
-          store.dispatch("logout");
+          //store.dispatch("logout");
         }
       }
     }
@@ -50,5 +53,8 @@ new Vue({
   router,
   store,
   vuetify,
+  created() {
+    this.$store.dispatch("getCurrentUser");
+  },
   render: h => h(App)
 }).$mount("#app");

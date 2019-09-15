@@ -6,7 +6,7 @@ import { defaultClient as apolloClient } from "../main";
 
 import app from "./modules/app";
 //import posts from "./modules/posts";
-//import user from "./modules/user";
+import auth from "./modules/auth";
 //import tags from "./modules/tags";
 //import profile from "./modules/profile";
 
@@ -15,6 +15,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
     app,
-
+    auth
   }
 });
