@@ -32,10 +32,10 @@ export const actions = {
       const { token } = data.signinUser;
       localStorage.setItem("token", token);
       commit(types.SET_LOGIN_SUCCESS);
-      await router.push("/");
+      await router.go("/");
     } catch (e) {
       //eslint-disable-next-line
-      console.warn(e);
+      //console.warn(e);
     }
   },
   logout: async ({ commit }) => {
@@ -43,7 +43,7 @@ export const actions = {
     commit(types.SET_CURRENT_USER, null);
     await apolloClient.resetStore();
     commit(types.SET_LOG_OUT_SUCCESS);
-    await router.push("/login");
+    router.go("/login");
   }
 };
 export const mutations = {
