@@ -2,9 +2,7 @@
   <v-card class="login pa-4 mx-auto">
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-text-field
-        dark
         v-model="email"
-        autocomplete="username-email"
         :rules="emailRules"
         label="E-mail"
         required
@@ -12,17 +10,16 @@
       <v-text-field
         v-model="password"
         :rules="passwordRules"
-        autocomplete="current-password"
         type="password"
         label="Password"
         required
       ></v-text-field>
 
-      <v-btn :disabled="!valid" color="success" class="ma-4" @click="validate">
+      <v-btn :disabled="!valid" color="primary" class="ma-4" @click="validate">
         Validate
       </v-btn>
 
-      <v-btn color="error" class="mr-4" @click="reset">
+      <v-btn color="primary" outlined class="mr-4" @click="reset">
         Reset Form
       </v-btn>
     </v-form>
