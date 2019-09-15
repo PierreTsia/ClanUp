@@ -12,7 +12,9 @@ describe("HelloWorld.vue", () => {
   beforeEach(() => {
     localVue = createLocalVue();
     localVue.use(Vuetify, Vuex);
+
     wrapper = shallowMount(HelloWorld, {
+      localVue,
       mocks: {
         $store: {
           getters: {
@@ -27,6 +29,10 @@ describe("HelloWorld.vue", () => {
   });
   it("should greet logged in user", () => {
     const title = wrapper.find(".heading");
-    expect(title.text()).toBe('Welcome back mock')
+    expect(title.text()).toBe("Welcome back mock");
+  });
+  it("should have a logout btn", () => {
+    const btn = wrapper.find(".logout");
+    expect(btn).toBeDefined();
   });
 });
