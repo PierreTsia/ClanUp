@@ -13,7 +13,7 @@ import * as types from "./store/mutation-types";
 Vue.use(VueApollo);
 
 export const defaultClient = new ApolloClient({
-  uri: "http://localhost:4000/graphql",
+  uri: "https://clanup.herokuapp.com/graphql",
   fetchOptions: {
     credentials: "include"
   },
