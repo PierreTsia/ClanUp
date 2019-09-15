@@ -21,7 +21,8 @@
   "scripts": {
     "server": "nodemon server.js",
     "client": "cd client && yarn serve",
-    "start": "concurrently -r --names \"server,client\" \"npm run server --silent\" \"npm run client --silent\""
+    "dev": "concurrently -r --names \"server,client\" \"npm run server --silent\" \"npm run client --silent\"",
+    "heroku-postbuild": "cd client && yarn install && yarn build"
   },
   "author": "",
   "license": "ISC"
