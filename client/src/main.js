@@ -11,8 +11,13 @@ import * as types from "./store/mutation-types";
 
 Vue.use(VueApollo);
 
+const API_URI =
+  process.env.NODE_ENV === "production"
+    ? "https://clanup.herokuapp.com"
+    : "http://localhost:4000";
+
 export const defaultClient = new ApolloClient({
-  uri: "https://clanup.herokuapp.com/graphql",
+  uri: `${API_URI}/graphql`,
   fetchOptions: {
     credentials: "include"
   },
@@ -37,14 +42,14 @@ export const defaultClient = new ApolloClient({
         if (err.name === "AuthenticationError") {
           console.warn(err);
           store.commit(types.SET_AUTH_ERROR, err);
-          //store.dispatch("logout");
+          store.dispatch("logout");
         }
       }
     }
   }
 });
 const apolloProvider = new VueApollo({ defaultClient });
-
+console.log(apolloProvider, process.env.NODE_ENV);
 Vue.config.productionTip = false;
 
 new Vue({
@@ -52,8 +57,5 @@ new Vue({
   router,
   store,
   vuetify,
-  created() {
-    this.$store.dispatch("getCurrentUser");
-  },
   render: h => h(App)
 }).$mount("#app");
