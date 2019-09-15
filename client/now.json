@@ -1,7 +1,15 @@
 {
   "version": 2,
   "name": "clan-up",
-  "builds": [{ "src": "package.json", "use": "@now/static-build" }],
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@now/static-build",
+      "config": {
+        "maxLambdaSize": "10mb"
+      }
+    }
+  ],
   "routes": [
     { "src": "^/js/(.*)", "dest": "/js/$1" },
     { "src": "^/css/(.*)", "dest": "/css/$1" },

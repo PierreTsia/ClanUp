@@ -9,7 +9,6 @@ import "roboto-fontface/css/roboto/roboto-fontface.css";
 import "@mdi/font/css/materialdesignicons.css";
 import * as types from "./store/mutation-types";
 
-
 Vue.use(VueApollo);
 
 export const defaultClient = new ApolloClient({
@@ -36,7 +35,7 @@ export const defaultClient = new ApolloClient({
       for (let err of graphQLErrors) {
         console.dir(err);
         if (err.name === "AuthenticationError") {
-         console.warn(err)
+          console.warn(err);
           store.commit(types.SET_AUTH_ERROR, err);
           //store.dispatch("logout");
         }
