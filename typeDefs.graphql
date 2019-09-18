@@ -18,4 +18,5 @@ type Mutation {
 
 type Query {
   getCurrentUser: User
+  isUsernameAvalaible(username: String!): Boolean
 }

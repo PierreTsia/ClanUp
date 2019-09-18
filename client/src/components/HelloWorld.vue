@@ -24,7 +24,6 @@ export default {
   methods: {
     ...mapActions(["logout"]),
     handleLogout() {
-      console.Log("click");
       this.logout();
     }
   }

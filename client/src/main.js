@@ -49,7 +49,6 @@ export const defaultClient = new ApolloClient({
   }
 });
 const apolloProvider = new VueApollo({ defaultClient });
-console.log(apolloProvider, process.env.NODE_ENV);
 Vue.config.productionTip = false;
 
 new Vue({

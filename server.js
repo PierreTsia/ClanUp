@@ -33,7 +33,7 @@ const getUser = async token => {
       return user;
     } catch (e) {
       throw new AuthenticationError(
-        "🚷Your session has expired. Please sign in again."
+        "🚷Invalid Token : your session has expired. Please sign in again."
       );
     }
   }

@@ -1,6 +1,10 @@
 import * as types from "../mutation-types";
 import { defaultClient as apolloClient } from "../../main";
-import { GET_CURRENT_USER, SIGNIN_USER } from "../../../queries";
+import {
+  GET_CURRENT_USER,
+  SIGNIN_USER,
+  VERIFY_USER_NAME
+} from "../../../queries";
 import router from "../../router";
 
 export const state = {
@@ -44,6 +48,18 @@ export const actions = {
     await apolloClient.resetStore();
     commit(types.SET_LOG_OUT_SUCCESS);
     router.go("/login");
+  },
+  verifyUsername: async (_, username) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: VERIFY_USER_NAME,
+        variables: { username }
+      });
+      return data.isUsernameAvalaible;
+    } catch (e) {
+      //eslint-disable-next-line
+      console.warn(e);
+    }
   }
 };
 export const mutations = {

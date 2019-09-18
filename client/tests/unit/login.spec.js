@@ -13,7 +13,7 @@ describe("Login.vue", () => {
   it("should have inputs for email and password", () => {
     const wrapper = mount(Login);
     const textFields = wrapper.findAll(".v-text-field");
-    expect(textFields.length).toEqual(2);
+    expect(textFields.length).toEqual(6);
     expect(textFields.at(0).props().label).toBe("E-mail");
     expect(textFields.at(1).props().label).toBe("Password");
   });

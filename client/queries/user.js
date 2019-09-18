@@ -11,6 +11,12 @@ export const GET_CURRENT_USER = gql`
   }
 `;
 
+export const VERIFY_USER_NAME = gql`
+  query($username: String!) {
+    isUsernameAvalaible(username: $username)
+  }
+`;
+
 export const SIGNIN_USER = gql`
   mutation($email: String!, $password: String!) {
     signinUser(email: $email, password: $password) {
