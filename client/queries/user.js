@@ -24,3 +24,11 @@ export const SIGNIN_USER = gql`
     }
   }
 `;
+
+export const SIGNUP_USER = gql`
+  mutation($email: String!, $username: String!, $password: String!) {
+    signupUser(username: $username, email: $email, password: $password) {
+      token
+    }
+  }
+`;

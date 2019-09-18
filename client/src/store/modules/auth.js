@@ -3,6 +3,7 @@ import { defaultClient as apolloClient } from "../../main";
 import {
   GET_CURRENT_USER,
   SIGNIN_USER,
+  SIGNUP_USER,
   VERIFY_USER_NAME
 } from "../../../queries";
 import router from "../../router";
@@ -26,6 +27,21 @@ export const actions = {
       console.warn(e);
     }
   },
+  signup: async ({ commit }, payload) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: SIGNUP_USER,
+        variables: payload
+      });
+      const { token } = data.signupUser;
+      localStorage.setItem("token", token);
+      commit(types.SET_LOGIN_SUCCESS);
+      await router.go("/");
+    } catch (e) {
+      //eslint-disable-next-line
+      console.warn(e);
+    }
+  },
   login: async ({ commit }, payload) => {
     localStorage.setItem("token", "");
     try {
@@ -39,7 +55,7 @@ export const actions = {
       await router.go("/");
     } catch (e) {
       //eslint-disable-next-line
-      //console.warn(e);
+      console.warn(e);
     }
   },
   logout: async ({ commit }) => {

@@ -6,7 +6,7 @@
         :rules="usernameRules"
         :success="isUsernameFree"
         :error="isAlreadyTaken"
-        :error-messages="isAlreadyTaken ? 'Already taken' : null"
+        :error-messages="isAlreadyTaken ? 'This Name is already taken' : null"
         label="User Name"
         @input="handleVerifyName"
         required
@@ -102,7 +102,8 @@ export default {
 
     validate() {
       if (this.$refs.form.validate()) {
-        this.$emit("onValidateClick", {
+        this.$emit("onValidateSignupClick", {
+          username: this.username,
           email: this.email,
           password: this.password
         });

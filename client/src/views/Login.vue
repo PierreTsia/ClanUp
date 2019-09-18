@@ -1,31 +1,73 @@
 <template>
   <div class="login container fill-height container--fluid pa-0">
-    <SigninForm
-      @onValidateClick="({ email, password }) => login({ email, password })"
-    >
-      <template slot="alert">
-        <v-alert dense outlined type="error">
-          I'm a dense alert with the <strong>outlined</strong> prop and a
-          <strong>type</strong> of error
-        </v-alert>
-      </template>
-    </SigninForm>
-    <SignupForm />
+    <SliderSelector
+      :items="forms"
+      activeItemId="signup-form"
+      @onItemClick="handleFormChange"
+    />
+    <v-layout column wrap>
+      <v-flex xs12>
+        <component
+          :is="activeComponentId"
+          @onValidateSigninClick="
+            ({ email, password }) => login({ email, password })
+          "
+          @onValidateSignupClick="
+            ({ username, email, password }) =>
+              signup({ username, email, password })
+          "
+          class="login__card"
+        ></component>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 <script>
 import { mapActions } from "vuex";
 import { SignupForm, SigninForm } from "@/components/login";
+import SliderSelector from "@/components/base/SliderSelector";
 
 export default {
   name: "Login",
-  data: () => ({}),
+  data: () => ({
+    activeComponent: "SignupForm",
+    activeComponentId: "signup-form",
+    forms: [
+      {
+        id: "signin-form",
+        icon: "mdi-account-key",
+        label: "Signin"
+      },
+      {
+        id: "signup-form",
+        icon: "mdi-account-edit",
+        label: "Signup"
+      }
+    ]
+  }),
   components: {
     SigninForm,
-    SignupForm
+    SignupForm,
+    SliderSelector
   },
   methods: {
-    ...mapActions(["login"])
+    ...mapActions(["login", "signup"]),
+    handleFormChange(tab) {
+      this.activeComponentId = tab.id;
+    }
   }
 };
 </script>
+<style lang="stylus">
+.login
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+  position relative
+.login__card
+  margin-top 100px
+  position relative
+.sliderSelector
+  margin-top 50px
+</style>

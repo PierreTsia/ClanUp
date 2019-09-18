@@ -46,7 +46,7 @@ export default {
   methods: {
     validate() {
       if (this.$refs.form.validate()) {
-        this.$emit("onValidateClick", {
+        this.$emit("onValidateSigninClick", {
           email: this.email,
           password: this.password
         });

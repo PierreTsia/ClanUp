@@ -75,8 +75,6 @@ export default {
   }),
   created() {
     // this.$vuetify.theme.dark = true;
-    console.log("ici", this.$route);
-    //this.$store.dispatch("getCurrentUser");
   }
 };
 </script>
