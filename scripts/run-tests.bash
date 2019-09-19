@@ -9,7 +9,7 @@ set -e
 cd "${0%/*}/.."
 
 # let's fake failing test for now
-echo "Running tests"
+echo "Running tests & lint"
 echo "............................"
-cd client && npm run test:unit
+cd client && npm run test:unit && npm run lint
 
