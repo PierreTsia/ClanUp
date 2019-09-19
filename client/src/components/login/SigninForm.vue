@@ -3,12 +3,14 @@
     <slot name="alert" />
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-text-field
+        class="text_field--email"
         v-model="email"
         :rules="emailRules"
         label="E-mail"
         required
       ></v-text-field>
       <v-text-field
+        class="text_field--password"
         v-model="password"
         :rules="passwordRules"
         type="password"

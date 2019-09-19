@@ -20,4 +20,6 @@ describe("Login.vue", () => {
     expect(wrapper.vm.$data.activeComponentId).toEqual("signin-form");
     expect(componentRef2.name()).toEqual("SigninForm");
   });
+
+
 });
