@@ -5,6 +5,6 @@ echo "Running pre-commit hook"
 
 # $? stores exit value of the last command
 if [ $? -ne 0 ]; then
- echo "Tests must pass before commit!"
+ echo "Correct lint errors or failed tests before commit"
  exit 1
 fi

@@ -1,4 +1,4 @@
-import { shallowMount, mount, createLocalVue } from "@vue/test-utils";
+import { mount, createLocalVue } from "@vue/test-utils";
 import SigninForm from "@/components/login/SigninForm.vue";
 import Vue from "vue";
 import Vuetify from "vuetify";
