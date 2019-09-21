@@ -28,7 +28,7 @@
         v-model="password2"
         :rules="password2Rules"
         type="password"
-        label="Password"
+        label="Confirm password"
         required
       ></v-text-field>
       <v-btn :disabled="!valid" color="primary" class="ma-4" @click="validate">
@@ -60,6 +60,7 @@ export default {
     password2: "",
     usernameRules: [
       n => !!n || "User Name is required",
+      n => !/\s/.test(n) || "No white spaces allowed",
       n =>
         (n && n.length > 4 && n.length <= 20) ||
         "User name must be between 5 and 20 chars"
@@ -111,6 +112,7 @@ export default {
     },
     reset() {
       this.$refs.form.reset();
+      console.log(!/\s/.test("aaa   a"));
     },
     handleVerifyName: _.debounce(async function() {
       if (this.username && this.username.length) {
