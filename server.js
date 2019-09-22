@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
-//const Profile = require("./models/Profile");*/
+const Board = require("./models/Board");
 
 //const Post = require("./models/Post");
 //const Tag = require("./models/Tag");
@@ -48,7 +48,8 @@ const server = new ApolloServer({
   }),
   context: async ({ req }) => ({
     currentUser: await getUser(req.headers.authorization),
-    User
+    User,
+    Board
   })
 });
 

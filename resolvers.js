@@ -3,17 +3,20 @@ const jwt = require("jsonwebtoken");
 const { partition } = require("lodash");
 
 const createToken = (user, secret, expiresIn) => {
-  const { username, email } = user;
-  return jwt.sign({ username, email }, secret, { expiresIn });
+  const { username, email, _id } = user;
+  return jwt.sign({ username, email, _id }, secret, { expiresIn });
 };
 
 module.exports = {
   /*
-  |--------------------------------------------------------------------------
-  |                     MUTATION   POSTS
-  |--------------------------------------------------------------------------
-  */
+   *
+   *
+   *   MUTATIONS
+   *
+   *
+   */
   Mutation: {
+    //USERS
     signupUser: async (_, { username, email, password }, { User }) => {
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -38,21 +41,67 @@ module.exports = {
         throw new Error("Password is incorrect");
       }
       return { token: createToken(user, process.env.SECRET, "1hr") };
+    },
+
+    //BOARDS
+    createBoard: async (_, { boardInput }, { User, Board, currentUser }) => {
+      console.log("boardInput", boardInput);
+      if (!currentUser) {
+        throw Error("Only authenticated users can create boards");
+      }
+
+      const board = await new Board({
+        ...boardInput,
+        owner: currentUser._id
+      }).save();
+
+      return board;
     }
   },
+  /*
+   *
+   *
+   * QUERIES
+   *
+   *
+   * */
+
   Query: {
+    //Users
     isUsernameAvalaible: async (_, { username }, { User }) => {
-      const existingUser = await User.findOne({ username });
-      return existingUser ? false : true;
+      try {
+        const existingUser = await User.findOne({ username });
+        return existingUser ? false : true;
+      } catch (e) {
+        throw Error(e);
+      }
     },
     getCurrentUser: async (_, args, { User, currentUser }) => {
       if (!currentUser) {
         return null;
       }
-      const user = await User.findOne({
-        email: currentUser.email
-      });
-      return user;
+      try {
+        const user = await User.findById(currentUser._id);
+        return user;
+      } catch (e) {
+        throw Error(e);
+      }
+    },
+
+    //Boards
+    getMyBoards: async (_, args, { Board, currentUser }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+      try {
+        const boards = await Board.find()
+          .where({ owner: currentUser })
+          .sort({ createdDate: -1 });
+
+        return boards;
+      } catch (e) {
+        throw Error(e);
+      }
     }
   }
 };

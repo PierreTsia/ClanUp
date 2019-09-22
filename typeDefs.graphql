@@ -7,16 +7,43 @@ type User {
   joinDate: String
 }
 
+type Board {
+  _id: ID
+  boardname: String!
+  owner: User!
+  contributors: [User]
+  description: String
+  createdDate: String
+  color: String
+  coverImg: String
+}
+
 type Token {
   token: String!
 }
 
+input BoardInput {
+  boardname: String!
+  owner: ID
+  description: String
+  coverImg: String
+  color: String
+}
+
+input UserInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
 type Mutation {
-  signupUser(username: String!, email: String!, password: String!): Token
+  signupUser(userInput: UserInput): Token
   signinUser(email: String!, password: String!): Token
+  createBoard(boardInput: BoardInput): Board
 }
 
 type Query {
   getCurrentUser: User
   isUsernameAvalaible(username: String!): Boolean
+  getMyBoards: [Board]
 }

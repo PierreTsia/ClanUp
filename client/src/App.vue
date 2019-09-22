@@ -1,78 +1,64 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer class="drawer" v-model="drawer" app clipped>
-      <v-list>
-        <v-list-item>
-          <v-list-item-icon>
-            <v-icon>mdi-view-dashboard</v-icon>
-          </v-list-item-icon>
+    <CreateBoardModal
+      :dialog="isActiveModal('create-board')"
+      :modalProps="modalProps"
+      @onClickOutside="closeModal()"
+    />
 
-          <v-list-item-title>Home</v-list-item-title>
-        </v-list-item>
-
-        <v-list-group prepend-icon="mdi-settings" value="true">
-          <template v-slot:activator>
-            <v-list-item-title>Settings</v-list-item-title>
-          </template>
-
-          <v-list-item-content>
-            <v-list-item-title :class="['drawer__darkmode']">{{
-              darkmode ? "Dark" : "Light"
-            }}</v-list-item-title>
-            <v-switch
-              v-model="darkmode"
-              class="drawer__darkMode__switch"
-              append-icon="mdi-theme-light-dark"
-              color="primary"
-              hide-details
-            ></v-switch>
-          </v-list-item-content>
-        </v-list-group>
-      </v-list>
-    </v-navigation-drawer>
-    <v-app-bar app clipped-left>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Application</v-toolbar-title>
-    </v-app-bar>
+    <NavigationDrawer :drawer="drawer" @onClickOutside="handleInputChange" />
+    <Navbar @drawer="drawer = !drawer" />
     <v-content>
       <v-container class="fill-height" fluid>
-        <router-view></router-view>
+        <v-layout row>
+          <router-view></router-view>
+        </v-layout>
       </v-container>
     </v-content>
-    <v-footer app>
-      <span>&copy; 2019</span>
-    </v-footer>
   </v-app>
 </template>
 
 <script>
+import Navbar from "@/components/navbar/Navbar.vue";
+import NavigationDrawer from "@/components/base/NavigationDrawer";
+import CreateBoardModal from "@/components/base/CreateBoardModal";
+
+import { mapGetters, mapMutations, mapActions } from "vuex";
 export default {
-  watch: {
-    darkmode: {
-      immediate: true,
-      handler(mode) {
-        this.$vuetify.theme.dark = mode;
-      }
-    }
-  },
   props: {
     source: String
   },
+  components: {
+    Navbar,
+    CreateBoardModal,
+    NavigationDrawer
+  },
   data: () => ({
-    drawer: null,
+    drawer: false,
     areSettingsShown: false,
-    darkmode: false,
-    admins: [
-      ["Management", "mdi-people_outline"],
-      ["Settings", "mdi-settings"]
-    ],
-    cruds: [
-      ["Create", "add"],
-      ["Read", "insert_drive_file"],
-      ["Update", "update"],
-      ["Delete", "delete"]
-    ]
+
+    dialog: true
   }),
+  computed: {
+    ...mapGetters([
+      "me",
+      "isDark",
+      "isModalShown",
+      "modalProps",
+      "activeModalName"
+    ])
+  },
+  methods: {
+    ...mapMutations({ toggleDarkmode: "APP_DARK_MODE" }),
+    ...mapActions(["closeModal"]),
+
+    isActiveModal(modalname) {
+      return this.activeModalName === modalname;
+    },
+    handleInputChange(value) {
+      this.drawer = value;
+    }
+  },
   created() {
     // this.$vuetify.theme.dark = true;
   }

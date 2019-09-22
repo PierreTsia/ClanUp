@@ -112,7 +112,6 @@ export default {
     },
     reset() {
       this.$refs.form.reset();
-      console.log(!/\s/.test("aaa   a"));
     },
     handleVerifyName: _.debounce(async function() {
       if (this.username && this.username.length) {
