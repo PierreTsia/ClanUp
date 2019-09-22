@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 export default {
   name: "NavigationDrawer",
   props: {
@@ -82,6 +82,7 @@ export default {
     ...mapGetters(["me", "isDark"])
   },
   methods: {
+    ...mapMutations({ toggleDarkmode: "APP_DARK_MODE" }),
     handleClickOutside() {
       this.$emit("onClickOutside", this.isShown);
     }

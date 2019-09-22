@@ -5,7 +5,6 @@
       :modalProps="modalProps"
       @onClickOutside="closeModal()"
     />
-
     <NavigationDrawer :drawer="drawer" @onClickOutside="handleInputChange" />
     <Navbar @drawer="drawer = !drawer" />
     <v-content>
@@ -23,7 +22,7 @@ import Navbar from "@/components/navbar/Navbar.vue";
 import NavigationDrawer from "@/components/base/NavigationDrawer";
 import CreateBoardModal from "@/components/base/CreateBoardModal";
 
-import { mapGetters, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
   props: {
     source: String
@@ -36,7 +35,6 @@ export default {
   data: () => ({
     drawer: false,
     areSettingsShown: false,
-
     dialog: true
   }),
   computed: {
@@ -49,7 +47,6 @@ export default {
     ])
   },
   methods: {
-    ...mapMutations({ toggleDarkmode: "APP_DARK_MODE" }),
     ...mapActions(["closeModal"]),
 
     isActiveModal(modalname) {

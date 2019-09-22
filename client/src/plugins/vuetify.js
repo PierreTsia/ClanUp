@@ -22,8 +22,7 @@ export default new Vuetify({
         primary: colors.blue.lighten3,
         secondary: colors.grey.lighten2,
         background: colors.indigo.darken2,
-        accent: colors.blue.darken2,
-
+        accent: colors.blue.darken2
       }
     }
   },

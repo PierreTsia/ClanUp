@@ -156,15 +156,14 @@ export default {
 </script>
 
 <style lang="stylus">
-$--pillsize = 40px
 .modal
     .pill
         display block
-        width $--pillsize
-        height $--pillsize
+        width 40px
+        height 40px
         border-radius 25%
         cursor pointer
-        margin-left calc(50% - ($--pillSize/2))
+        margin-left calc(50% - 20px)
     .background
       position relative
       .form
