@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { partition } = require("lodash");
 
 const createToken = (user, secret, expiresIn) => {
   const { username, email, _id } = user;
@@ -17,16 +16,14 @@ module.exports = {
    */
   Mutation: {
     //USERS
-    signupUser: async (_, { username, email, password }, { User }) => {
-      const existingUser = await User.findOne({ username });
+    signupUser: async (_, { userInput }, { User }) => {
+      const existingUser = await User.findOne({ username: userInput.username });
       if (existingUser) {
         throw new Error("User already exists");
       }
 
       const user = await new User({
-        username,
-        email,
-        password
+        ...userInput
       }).save();
       return { token: createToken(user, process.env.SECRET, "1hr") };
     },
@@ -45,7 +42,6 @@ module.exports = {
 
     //BOARDS
     createBoard: async (_, { boardInput }, { User, Board, currentUser }) => {
-      console.log("boardInput", boardInput);
       if (!currentUser) {
         throw Error("Only authenticated users can create boards");
       }
@@ -56,6 +52,23 @@ module.exports = {
       }).save();
 
       return board;
+    },
+
+    deleteBoard: async (_, { boardId }, { Board, currentUser }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+      const boardToDelete = await Board.findById(boardId);
+
+      if (!boardToDelete) {
+        throw Error(`No board found with id ${boardId}`);
+      }
+      if (!boardToDelete.owner.equals(currentUser._id)) {
+        throw Error("Only owner can delete a board");
+      }
+
+      await Board.deleteOne({ _id: boardToDelete._id });
+      return boardToDelete._id;
     }
   },
   /*
@@ -102,6 +115,25 @@ module.exports = {
       } catch (e) {
         throw Error(e);
       }
+    },
+
+    getBoardById: async (_, { boardId }, { Board, User, currentUser }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+      const board = await Board.findById(boardId).populate({
+        path: "owner",
+        model: "User"
+      });
+      if (!board) {
+        throw Error("No board found");
+      }
+
+      if (!board.owner.equals(currentUser._id)) {
+        throw Error("Unauthorized");
+      }
+
+      return board;
     }
   }
 };

@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import Login from "./views/Login.vue";
+import BoardView from "./views/BoardView";
 
 import AuthGuard from "./AuthGuard";
 
@@ -21,6 +22,12 @@ export default new Router({
       path: "/login",
       name: "login",
       component: Login,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: "/board/:id",
+      name: "board",
+      component: BoardView,
       beforeEnter: AuthGuard
     }
 

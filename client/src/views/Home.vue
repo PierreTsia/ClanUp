@@ -2,7 +2,7 @@
   <div class="home container flex-column">
     <v-layout row wrap>
       <h3 class="text--secondary pl-3">Boards</h3>
-      <Boards>
+      <Boards :boards="boards">
         <template slot="createNewBoard">
           <v-flex class="my-auto ma-auto">
             <div class="slot-text subtitle-2  text-center">
@@ -30,7 +30,7 @@ export default {
     return {};
   },
   computed: {
-    ...mapGetters(["userHasBoards"])
+    ...mapGetters(["userHasBoards", "boards"])
   },
   methods: {
     ...mapActions(["getMyBoards"])

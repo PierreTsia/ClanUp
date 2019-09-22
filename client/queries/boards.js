@@ -12,6 +12,21 @@ export const GET_MYBOARDS = gql`
   }
 `;
 
+export const GET_BOARD_BY_ID = gql`
+  query($boardId: ID!) {
+    getBoardById(boardId: $boardId) {
+      _id
+      boardname
+      description
+      createdDate
+      owner {
+        _id
+        username
+      }
+    }
+  }
+`;
+
 export const CREATE_BOARD = gql`
   mutation($boardinput: BoardInput) {
     createBoard(boardInput: $boardinput) {
@@ -25,5 +40,11 @@ export const CREATE_BOARD = gql`
         _id
       }
     }
+  }
+`;
+
+export const DELETE_BOARD = gql`
+  mutation($boardId: ID!) {
+    deleteBoard(boardId: $boardId)
   }
 `;

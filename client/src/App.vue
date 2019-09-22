@@ -5,6 +5,11 @@
       :modalProps="modalProps"
       @onClickOutside="closeModal()"
     />
+    <ConfirmModal
+      :dialog="isActiveModal('confirm-modal')"
+      :modalProps="modalProps"
+      @onClickOutside="closeModal()"
+    />
     <NavigationDrawer :drawer="drawer" @onClickOutside="handleInputChange" />
     <Navbar @drawer="drawer = !drawer" />
     <v-content>
@@ -21,6 +26,7 @@
 import Navbar from "@/components/navbar/Navbar.vue";
 import NavigationDrawer from "@/components/base/NavigationDrawer";
 import CreateBoardModal from "@/components/base/CreateBoardModal";
+import ConfirmModal from "@/components/base/ConfirmModal";
 
 import { mapGetters, mapActions } from "vuex";
 export default {
@@ -30,6 +36,7 @@ export default {
   components: {
     Navbar,
     CreateBoardModal,
+    ConfirmModal,
     NavigationDrawer
   },
   data: () => ({

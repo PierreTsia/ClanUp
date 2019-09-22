@@ -1,26 +1,17 @@
 <template>
   <v-container class="pa-2" fluid>
     <v-layout row wrap>
-      <v-flex xs12 sm4 lg3 v-for="board in boards" :key="board._id">
-        <v-card
-          :class="['ma-4', 'd-flex', 'board']"
-          max-height="100px"
-          min-height="100px"
-          :color="board.color ? board.color : null"
-        >
-          <v-img
-            v-if="board.coverImg"
-            class="white--text"
-            height="100px"
-            :lazy-src="board.coverImg"
-          ></v-img>
-          <v-card-text class="boardName pb-0 pl-1">
-            <div class="subtitle-2 white--text font-weight-bold ">
-              {{ board.boardname }}
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-flex>
+      <Board
+        v-for="board in boards"
+        :key="board._id"
+        :board="board"
+        :hover="isActive(board._id)"
+        @onMouseEnter="handleMouseEnter"
+        @onMouseLeave="handleMouseLeave"
+        @onDeleteClick="handleDeleteClick"
+        @click.native.stop="handleBoardClick(board._id)"
+      />
+
       <v-flex xs12 sm3 md2>
         <v-hover v-slot:default="{ hover: createNewIsHover }">
           <v-card
@@ -42,15 +33,27 @@
 </template>
 
 <script>
+import Board from "@/components/boards/Board";
 import { mapGetters, mapActions } from "vuex";
 export default {
   name: "Boards.vue",
+  props: {
+    boards: {
+      type: Array,
+      default: () => []
+    }
+  },
+  components: {
+    Board
+  },
   computed: {
-    ...mapGetters(["boards", "me"])
+    ...mapGetters(["me"])
   },
   data() {
     return {
       createNewIsHover: false,
+      activeBoardId: null,
+      boardIsHover: false,
       defaultImgUrls: [
         "https://i.ibb.co/wdJh15D/bg-rand1.jpg",
         "https://i.ibb.co/s60NwT2/bg-rand5.jpg",
@@ -62,9 +65,13 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["openModal", "closeModal", "createBoard"]),
+    ...mapActions([
+      "openModal",
+      "closeModal",
+      "createBoard",
+      "deleteBoardById"
+    ]),
     handleCreateNewBoardClick() {
-      console.log("create");
       this.openModal({
         name: "create-board",
         props: {
@@ -77,12 +84,43 @@ export default {
           }
         }
       });
+    },
+    handleBoardClick(boardId) {
+      this.$router.push(`/board/${boardId}`);
+    },
+    isActive(boardId) {
+      return boardId === this.activeBoardId;
+    },
+    setActiveBoard({ boardId }) {
+      this.activeBoardId = boardId;
+    },
+    handleMouseEnter(boardId) {
+      this.setActiveBoard({ boardId });
+    },
+    handleMouseLeave() {
+      this.setActiveBoard({ boardId: null });
+    },
+    handleDeleteClick(board) {
+      this.openModal({
+        name: "confirm-modal",
+        props: {
+          title: "Delete board",
+          message: `Are your sure you want to delete ${board.boardname} ?`,
+          onConfirmClick: async () => {
+            await this.deleteBoardById(board._id);
+            this.closeModal();
+          },
+          onCancelClick: () => {
+            this.closeModal();
+          }
+        }
+      });
     }
   }
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="stylus">
 .v-card
   transition all ease-in 0.3
   position relative

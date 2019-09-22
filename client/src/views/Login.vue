@@ -12,10 +12,7 @@
           @onValidateSigninClick="
             ({ email, password }) => login({ email, password })
           "
-          @onValidateSignupClick="
-            ({ username, email, password }) =>
-              signup({ username, email, password })
-          "
+          @onValidateSignupClick="userInput => signup({ userInput })"
           class="login__card"
         ></component>
       </v-flex>

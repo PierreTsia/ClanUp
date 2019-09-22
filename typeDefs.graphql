@@ -40,10 +40,12 @@ type Mutation {
   signupUser(userInput: UserInput): Token
   signinUser(email: String!, password: String!): Token
   createBoard(boardInput: BoardInput): Board
+  deleteBoard(boardId: ID): String
 }
 
 type Query {
   getCurrentUser: User
   isUsernameAvalaible(username: String!): Boolean
   getMyBoards: [Board]
+  getBoardById(boardId: ID!): Board
 }

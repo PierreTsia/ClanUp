@@ -27,11 +27,11 @@ export const actions = {
       console.warn(e);
     }
   },
-  signup: async ({ commit }, payload) => {
+  signup: async ({ commit }, { userInput }) => {
     try {
       const { data } = await apolloClient.mutate({
         mutation: SIGNUP_USER,
-        variables: payload
+        variables: { userInput }
       });
       const { token } = data.signupUser;
       localStorage.setItem("token", token);

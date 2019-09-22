@@ -4,7 +4,13 @@ import {
   SIGNUP_USER,
   VERIFY_USER_NAME
 } from "./user";
-import { GET_MYBOARDS, CREATE_BOARD } from "./boards";
+
+import {
+  GET_MYBOARDS,
+  CREATE_BOARD,
+  DELETE_BOARD,
+  GET_BOARD_BY_ID
+} from "./boards";
 
 export {
   GET_CURRENT_USER,
@@ -12,5 +18,7 @@ export {
   VERIFY_USER_NAME,
   SIGNUP_USER,
   GET_MYBOARDS,
-  CREATE_BOARD
+  CREATE_BOARD,
+  DELETE_BOARD,
+  GET_BOARD_BY_ID
 };
