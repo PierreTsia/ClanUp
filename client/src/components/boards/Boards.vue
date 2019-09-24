@@ -15,7 +15,7 @@
       <v-flex xs12 sm3 md2>
         <v-hover v-slot:default="{ hover: createNewIsHover }">
           <v-card
-            class="ma-4 d-flex"
+            class="ma-4 d-flex createNewBoard"
             outlined
             flat
             :color="createNewIsHover ? `accent` : 'background'"
@@ -101,6 +101,9 @@ export default {
       this.setActiveBoard({ boardId: null });
     },
     handleDeleteClick(board) {
+      if (!board) {
+        return;
+      }
       this.openModal({
         name: "confirm-modal",
         props: {
