@@ -13,14 +13,21 @@
             ({ email, password }) => login({ email, password })
           "
           @onValidateSignupClick="userInput => signup({ userInput })"
+          @onFormReset="clearErrors"
           class="login__card"
-        ></component>
+        >
+          <template slot="alert">
+            <v-alert v-if="authError" dense outlined type="error">
+              {{ authError.message }}
+            </v-alert>
+          </template>
+        </component>
       </v-flex>
     </v-layout>
   </div>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 import { SignupForm, SigninForm } from "@/components/login";
 import SliderSelector from "@/components/base/SliderSelector";
 
@@ -47,10 +54,16 @@ export default {
     SignupForm,
     SliderSelector
   },
+  computed: {
+    ...mapGetters(["authError"])
+  },
   methods: {
     ...mapActions(["login", "signup"]),
+    ...mapMutations({ clearErrors: "CLEAR_ERRORS" }),
     handleFormChange(tab) {
+      console.log("pouet");
       this.activeComponentId = tab.id;
+      this.clearErrors();
     }
   }
 };

@@ -25,6 +25,8 @@ export const actions = {
     } catch (e) {
       //eslint-disable-next-line
       console.warn(e);
+      const { message, name } = e;
+      commit(types.SET_AUTH_ERROR, { message, name });
     }
   },
   signup: async ({ commit }, { userInput }) => {
@@ -40,6 +42,8 @@ export const actions = {
     } catch (e) {
       //eslint-disable-next-line
       console.warn(e);
+      const { message, name } = e;
+      commit(types.SET_AUTH_ERROR, { message, name });
     }
   },
   login: async ({ commit }, payload) => {
@@ -56,6 +60,8 @@ export const actions = {
     } catch (e) {
       //eslint-disable-next-line
       console.warn(e);
+      const { message, name } = e;
+      commit(types.SET_AUTH_ERROR, { message, name });
     }
   },
   logout: async ({ commit }) => {
@@ -82,7 +88,9 @@ export const mutations = {
   [types.SET_AUTH_ERROR]: (state, error) => (state.error = error),
   [types.SET_CURRENT_USER]: (state, user) => (state.currentUser = user),
   [types.SET_LOG_OUT_SUCCESS]: state => (state.currentUser = null),
-  [types.SET_LOGIN_SUCCESS]: state => (state.error = null)
+  [types.SET_LOGIN_SUCCESS]: state => (state.error = null),
+  [types.SET_AUTH_ERROR]: (state, error) => (state.error = error),
+  [types.CLEAR_ERRORS]: state => (state.error = null)
 };
 export default {
   state,

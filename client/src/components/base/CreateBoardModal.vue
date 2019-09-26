@@ -141,6 +141,16 @@ export default {
     setActiveBackground({ color, coverImg }) {
       this.activeBackground = { color, coverImg };
     },
+    noFieldsAreMissing(boardinput) {
+      const requiredFields = ["boardname", "description"].every(attr =>
+        Object.keys(boardinput).includes(attr)
+      );
+
+      const oneOverTwoFields = ["coverImg", "color"].some(attr =>
+        Object.keys(boardinput).includes(attr)
+      );
+      return requiredFields && oneOverTwoFields;
+    },
 
     handleConfirmClick() {
       const boardinput = _.pickBy({
@@ -148,8 +158,9 @@ export default {
         description: this.description,
         ...this.activeBackground
       });
-
-      this.modalProps.onConfirmClick({ boardinput });
+      if (this.noFieldsAreMissing(boardinput)) {
+        this.modalProps.onConfirmClick({ boardinput });
+      }
     }
   }
 };

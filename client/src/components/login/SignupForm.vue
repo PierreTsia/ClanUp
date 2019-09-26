@@ -1,5 +1,6 @@
 <template>
   <v-card class="login pa-4 mx-auto">
+    <slot name="alert" />
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-text-field
         v-model="username"
@@ -112,6 +113,7 @@ export default {
     },
     reset() {
       this.$refs.form.reset();
+      this.$emit("onFormReset");
     },
     handleVerifyName: _.debounce(async function() {
       if (this.username && this.username.length) {
