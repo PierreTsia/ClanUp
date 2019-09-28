@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
   name: "NavigationDrawer",
   props: {
@@ -58,16 +58,11 @@ export default {
       }
     },
 
-    isDark: {
-      immediate: true,
-      handler(bool) {
-        this.$vuetify.theme.dark = bool;
-        this.darktheme = bool;
-      }
-    },
     darktheme: {
-      handler() {
-        this.toggleDarkmode();
+      handler(isDark) {
+        this.$vuetify.theme.dark = isDark;
+        const theme = isDark ? "dark" : "light";
+        this.setAppTheme(theme);
       }
     }
   },
@@ -82,10 +77,13 @@ export default {
     ...mapGetters(["me", "isDark"])
   },
   methods: {
-    ...mapMutations({ toggleDarkmode: "APP_DARK_MODE" }),
+    ...mapActions(["setAppTheme"]),
     handleClickOutside() {
       this.$emit("onClickOutside", this.isShown);
     }
+  },
+  async mounted() {
+    this.darktheme = this.isDark;
   }
 };
 </script>

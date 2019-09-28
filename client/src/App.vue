@@ -54,7 +54,7 @@ export default {
     ])
   },
   methods: {
-    ...mapActions(["closeModal"]),
+    ...mapActions(["closeModal", "setAppTheme", "getAppTheme"]),
 
     isActiveModal(modalname) {
       return this.activeModalName === modalname;
@@ -63,8 +63,12 @@ export default {
       this.drawer = value;
     }
   },
-  created() {
-    // this.$vuetify.theme.dark = true;
+  async created() {
+    //  = true;
+    const theme = await this.getAppTheme();
+    this.$vuetify.theme.dark = theme === "dark" ? true : false;
+
+    this.setAppTheme(theme);
   }
 };
 </script>
