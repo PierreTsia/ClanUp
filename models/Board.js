@@ -19,8 +19,7 @@ const BoardSchema = new mongoose.Schema({
     required: true
   },
   color: {
-    type: String,
-    default: "#001A29"
+    type: String
   },
   coverImg: {
     type: String

@@ -19,6 +19,8 @@ export const GET_BOARD_BY_ID = gql`
       boardname
       description
       createdDate
+      color
+      coverImg
       owner {
         _id
         username
@@ -38,6 +40,23 @@ export const CREATE_BOARD = gql`
       createdDate
       owner {
         _id
+      }
+    }
+  }
+`;
+
+export const UPDATE_BOARD = gql`
+  mutation($boardId: ID!, $boardInput: BoardInput!) {
+    updateBoard(boardId: $boardId, boardInput: $boardInput) {
+      _id
+      boardname
+      color
+      coverImg
+      description
+      createdDate
+      owner {
+        _id
+        username
       }
     }
   }

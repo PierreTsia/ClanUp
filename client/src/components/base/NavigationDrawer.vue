@@ -8,11 +8,10 @@
     clipped
   >
     <v-list>
-      <v-list-item>
+      <v-list-item @click="handleGoHome">
         <v-list-item-icon>
           <v-icon>mdi-view-dashboard</v-icon>
         </v-list-item-icon>
-
         <v-list-item-title>Home</v-list-item-title>
       </v-list-item>
 
@@ -80,6 +79,11 @@ export default {
     ...mapActions(["setAppTheme"]),
     handleClickOutside() {
       this.$emit("onClickOutside", this.isShown);
+    },
+    handleGoHome() {
+      if (this.$route.fullPath !== "/") {
+        this.$router.push("/");
+      }
     }
   },
   async mounted() {

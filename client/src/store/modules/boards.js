@@ -4,7 +4,8 @@ import {
   CREATE_BOARD,
   GET_MYBOARDS,
   DELETE_BOARD,
-  GET_BOARD_BY_ID
+  GET_BOARD_BY_ID,
+  UPDATE_BOARD
 } from "../../../queries";
 import router from "../../router";
 export const state = {
@@ -15,15 +16,20 @@ export const state = {
 export const getters = {
   userHasBoards: state => !!(state.boards && state.boards.length),
   boards: state => state.boards,
-  boardError: state => state.error
+  boardError: state => state.error,
+  currentBoard: state => state.currentBoard
 };
 
 export const actions = {
   getMyBoards: async ({ commit }) => {
-    const { data } = await apolloClient.query({
-      query: GET_MYBOARDS
-    });
-    commit(types.SET_BOARDS_SUCCESS, data.getMyBoards);
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_MYBOARDS
+      });
+      commit(types.SET_BOARDS_SUCCESS, data.getMyBoards);
+    } catch (e) {
+      console.warn(e);
+    }
   },
   createBoard: async ({ commit }, boardInput) => {
     const { data } = await apolloClient.mutate({
@@ -49,21 +55,36 @@ export const actions = {
 
       commit(types.GET_BOARD_BY_ID_SUCCESS, data.getBoardById);
     } catch ({ message }) {
-      commit(types.GET_BOARD_BY_ID_ERROR, message);
+      commit(types.SET_BOARD_ERROR, message);
       await router.push("/");
+    }
+  },
+
+  updateBoard: async ({ commit }, payload) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_BOARD,
+        variables: payload
+      });
+      commit(types.SET_CURRENT_BOARD, data.updateBoard);
+    } catch (e) {
+      commit(types.SET_BOARD_ERROR, e);
     }
   }
 };
 
 export const mutations = {
-  [types.SET_BOARDS_SUCCESS]: (state, boards) => (state.boards = boards),
+  [types.SET_BOARDS_SUCCESS]: (state, boards) => {
+    state.boards = boards;
+  },
   [types.CREATE_BOARD_SUCCESS]: (state, board) =>
     (state.boards = [board, ...state.boards]),
   [types.DELETE_BOARD_SUCCES]: (state, boardId) =>
     (state.boards = state.boards.filter(({ _id }) => _id !== boardId)),
   [types.GET_BOARD_BY_ID_SUCCESS]: (state, board) =>
     (state.currentBoard = board),
-  [types.GET_BOARD_BY_ID_ERROR]: (state, error) => (state.error = error)
+  [types.SET_BOARD_ERROR]: (state, error) => (state.error = error),
+  [types.SET_CURRENT_BOARD]: (state, board) => (state.currentBoard = board)
 };
 
 export default {

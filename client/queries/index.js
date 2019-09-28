@@ -9,7 +9,8 @@ import {
   GET_MYBOARDS,
   CREATE_BOARD,
   DELETE_BOARD,
-  GET_BOARD_BY_ID
+  GET_BOARD_BY_ID,
+  UPDATE_BOARD
 } from "./boards";
 
 export {
@@ -20,5 +21,6 @@ export {
   GET_MYBOARDS,
   CREATE_BOARD,
   DELETE_BOARD,
-  GET_BOARD_BY_ID
+  GET_BOARD_BY_ID,
+  UPDATE_BOARD
 };

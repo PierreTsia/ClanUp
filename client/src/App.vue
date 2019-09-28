@@ -13,11 +13,9 @@
     <NavigationDrawer :drawer="drawer" @onClickOutside="handleInputChange" />
     <Navbar @drawer="drawer = !drawer" />
     <v-content>
-      <v-container class="fill-height" fluid>
-        <v-layout row>
-          <router-view></router-view>
-        </v-layout>
-      </v-container>
+      <div class="fill-height" fluid>
+        <router-view></router-view>
+      </div>
     </v-content>
   </v-app>
 </template>
@@ -54,7 +52,7 @@ export default {
     ])
   },
   methods: {
-    ...mapActions(["closeModal", "setAppTheme", "getAppTheme"]),
+    ...mapActions(["closeModal", "setAppTheme", "getAppTheme", "getMyBoards"]),
 
     isActiveModal(modalname) {
       return this.activeModalName === modalname;
@@ -64,10 +62,8 @@ export default {
     }
   },
   async created() {
-    //  = true;
     const theme = await this.getAppTheme();
-    this.$vuetify.theme.dark = theme === "dark" ? true : false;
-
+    this.$vuetify.theme.dark = theme === "dark";
     this.setAppTheme(theme);
   }
 };

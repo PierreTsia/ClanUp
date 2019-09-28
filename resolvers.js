@@ -31,7 +31,7 @@ module.exports = {
     signinUser: async (_, { email, password }, { User }) => {
       const user = await User.findOne({ email });
       if (!user) {
-        throw new Error(`No user found with email ${email}`);
+        throw new Error(`No user found`);
       }
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
@@ -69,6 +69,36 @@ module.exports = {
 
       await Board.deleteOne({ _id: boardToDelete._id });
       return boardToDelete._id;
+    },
+
+    updateBoard: async (
+      _,
+      { boardInput, boardId },
+      { Board, User, currentUser }
+    ) => {
+      if (!currentUser) {
+        return new Error("Unauthorized : must be signed in to modify a board");
+      }
+
+      const boardToUpdate = await Board.findById(boardId);
+
+      if (!boardToUpdate) {
+        throw Error(`No board found with id ${boardId}`);
+      }
+      if (!boardToUpdate.owner.equals(currentUser._id)) {
+        throw Error("Only owner can update a board");
+      }
+
+      const { ...fields } = boardInput;
+
+      // noinspection UnnecessaryLocalVariableJS
+      const updatedBoard = await Board.findOneAndUpdate(
+        { _id: boardId },
+        { ...fields },
+        { new: true }
+      ).populate([{ path: "owner", model: "User" }]);
+
+      return updatedBoard;
     }
   },
   /*

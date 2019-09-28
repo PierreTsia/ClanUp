@@ -40,7 +40,8 @@ type Mutation {
   signupUser(userInput: UserInput): Token
   signinUser(email: String!, password: String!): Token
   createBoard(boardInput: BoardInput): Board
-  deleteBoard(boardId: ID): String
+  deleteBoard(boardId: ID): String,
+  updateBoard(boardInput: BoardInput!, boardId: ID!):Board
 }
 
 type Query {

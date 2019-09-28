@@ -61,7 +61,6 @@ export default {
     ...mapActions(["login", "signup"]),
     ...mapMutations({ clearErrors: "CLEAR_ERRORS" }),
     handleFormChange(tab) {
-      console.log("pouet");
       this.activeComponentId = tab.id;
       this.clearErrors();
     }
