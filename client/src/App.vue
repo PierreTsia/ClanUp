@@ -42,6 +42,14 @@ export default {
     areSettingsShown: false,
     dialog: true
   }),
+  watch: {
+    me: {
+      immediate: true,
+      handler(me) {
+        console.log(me);
+      }
+    }
+  },
   computed: {
     ...mapGetters([
       "me",
@@ -65,6 +73,7 @@ export default {
     const theme = await this.getAppTheme();
     this.$vuetify.theme.dark = theme === "dark";
     this.setAppTheme(theme);
+    await this.getMyBoards();
   }
 };
 </script>

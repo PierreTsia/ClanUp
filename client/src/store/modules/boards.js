@@ -26,9 +26,11 @@ export const actions = {
       const { data } = await apolloClient.query({
         query: GET_MYBOARDS
       });
+      console.log("data", data);
       commit(types.SET_BOARDS_SUCCESS, data.getMyBoards);
-    } catch (e) {
-      console.warn(e);
+    } catch ({ message }) {
+      console.warn(message);
+      commit(types.GET_BOARDS_ERROR, message);
     }
   },
   createBoard: async ({ commit }, boardInput) => {
@@ -84,7 +86,12 @@ export const mutations = {
   [types.GET_BOARD_BY_ID_SUCCESS]: (state, board) =>
     (state.currentBoard = board),
   [types.SET_BOARD_ERROR]: (state, error) => (state.error = error),
-  [types.SET_CURRENT_BOARD]: (state, board) => (state.currentBoard = board)
+  [types.SET_CURRENT_BOARD]: (state, board) => {
+    state.currentBoard = board;
+    const index = state.boards.findIndex(b => b._id === board._id);
+    state.boards[index] = board;
+  },
+  [types.GET_BOARDS_ERROR]: (state, errorMsg) => (state.error = errorMsg)
 };
 
 export default {

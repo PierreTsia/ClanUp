@@ -23,9 +23,7 @@ export default {
   components: {
     Boards
   },
-  async created() {
-    await this.getMyBoards();
-  },
+
   data() {
     return {};
   },
@@ -34,6 +32,10 @@ export default {
   },
   methods: {
     ...mapActions(["getMyBoards"])
+  },
+  async mounted() {
+    console.log("ici?");
+    // await this.getMyBoards();
   }
 };
 </script>

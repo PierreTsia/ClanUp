@@ -28,22 +28,30 @@
         ></v-text-field>
       </v-flex>
     </v-layout>
-    <div>
+    <div class="columns">
       <Container
         orientation="horizontal"
         @drop="onColumnDrop($event)"
         drag-handle-selector=".column-drag-handle"
+        class="columnsDropContainer"
         @drag-start="dragStart"
         :drop-placeholder="upperDropPlaceholderOptions"
       >
         <Draggable v-for="column in sortedColumns" :key="column.id">
-          <div class="card-container">
-            <div class="card-column-header">
-              <span class="column-drag-handle">&#x2630;</span>
-              {{ column.name }}
+          <div class="columnContainer mx-2 px-1">
+            <div
+              class="columnContainer__header py-1 pr-2 pl-0 d-flex justify-xs-space-between"
+            >
+              <v-icon color="black" class="column-drag-handle mr-1"
+                >mdi-drag</v-icon
+              >
+              <span class="flex-grow-1 text-sm-right pr-1 font-weight-bold">
+                {{ column.name }}
+              </span>
             </div>
             <Container
               group-name="col"
+              class="px-1"
               @drop="e => onCardDrop(column.id, e)"
               @drag-start="e => handleDragStart(e)"
               @drag-end="e => handleDragEnd(e)"
@@ -61,6 +69,14 @@
                 </v-card>
               </Draggable>
             </Container>
+            <div class="columnContainer__footer py-1 d-flex justify-xs-center">
+              <v-btn depressed class="transparent mx-auto" small color="black">
+                <v-icon color="black" size="16" class="mr-1">mdi-plus</v-icon>
+                <span class="text-xs-left pr-1 black--text">
+                  Add card
+                </span>
+              </v-btn>
+            </div>
           </div>
         </Draggable>
       </Container>
@@ -118,16 +134,10 @@ export default {
   name: "BoardView.vue",
   components: { Container, Draggable },
   watch: {
-    boardColumns: {
-      immediate: true,
-      deep: true,
-      handler(newColumns, oldColumns) {
-        console.log("news cols", _.difference(newColumns, oldColumns));
-      }
-    },
     boardColOrder: {
       handler(newOrder, oldOrder) {
         if (newOrder.length && oldOrder.length && newOrder !== oldOrder) {
+          //eslint-disable-next-line
           //console.log("MUTATE WITH ORDER", newOrder, oldOrder);
         }
       }
@@ -298,13 +308,21 @@ export default {
 <style lang="stylus">
 .boardView
   background-size cover
-  .smooth-dnd-container
-    width 100%
-    .smooth-dnd-draggable-wrapper
-      padding 0 0.5rem
-  .card-container
-    outline 1px solid red
-
-/*  .boardView__top
-    outline 1px solid red*/
+  .columns
+    .columnsDropContainer
+      min-width 100%
+      display flex
+      overflow-x auto
+    .columnContainer
+      border-radius 5px
+      background-color #EBECF0
+      color #314261
+      width 200px
+      .columnContainer__header
+        .v-icon
+          cursor grab
+          &:active
+            cursor grabbing
+      .card-container
+          cursor grab
 </style>

@@ -2,6 +2,7 @@ import store from "./store/index";
 
 export default async (to, from, next) => {
   await store.dispatch("getCurrentUser");
+  //await store.dispatch("getMyBoards");
   switch (to.name) {
     case "login":
       return store.getters.isAuth ? next({ path: "/" }) : next();
