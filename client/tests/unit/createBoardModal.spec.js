@@ -19,6 +19,7 @@ describe("CreateBoardModal.vue", () => {
     jest.spyOn(modalProps, "onConfirmClick");
     const wrapper = shallowMount(CreateBoardModal, {
       localVue,
+      store: getStore(),
       propsData: { modalProps }
     });
 
@@ -38,6 +39,7 @@ describe("CreateBoardModal.vue", () => {
     jest.spyOn(modalProps, "onConfirmClick");
     const wrapper = shallowMount(CreateBoardModal, {
       localVue,
+      store: getStore(),
       propsData: { modalProps }
     });
 
@@ -52,3 +54,19 @@ describe("CreateBoardModal.vue", () => {
     expect(modalProps.onConfirmClick).not.toHaveBeenCalled();
   });
 });
+
+const getStore = () =>
+  new Vuex.Store({
+    state: {},
+    actions: {},
+    getters: {
+      me: () => {
+        return {
+          _id: "5d8622c8368bc87dd6a44b8c",
+          username: "pierre_Tsia",
+          avatar:
+            "https://gravatar.com/avatar/98f0de97c688d90aacbea76a272215be?d=identicon"
+        };
+      }
+    }
+  });

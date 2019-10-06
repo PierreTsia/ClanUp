@@ -16,6 +16,31 @@ type Board {
   createdDate: String
   color: String
   coverImg: String
+  columns: [Column]
+}
+
+type Order {
+  _id: ID!
+  order: Int!
+}
+
+type Column {
+  _id: ID
+  title: String!
+  position: Int!
+  boardId: ID!
+  author: User
+  cards: [Card]
+  createdDate: String
+}
+
+type Card {
+  _id: ID
+  title: String!
+  board: Board!
+  author: User!
+  column: Column!
+  createdDate: String
 }
 
 type Token {
@@ -24,7 +49,7 @@ type Token {
 
 input BoardInput {
   boardname: String!
-  owner: ID
+  owner: ID!
   description: String
   coverImg: String
   color: String
@@ -36,12 +61,24 @@ input UserInput {
   password: String!
 }
 
+input ColumnInput {
+  _id: ID
+  title: String!
+  boardId: ID!
+  position: Int!
+  createdDate: String
+}
+
+
+
 type Mutation {
   signupUser(userInput: UserInput): Token
   signinUser(email: String!, password: String!): Token
   createBoard(boardInput: BoardInput): Board
-  deleteBoard(boardId: ID): String,
-  updateBoard(boardInput: BoardInput!, boardId: ID!):Board
+  deleteBoard(boardId: ID): String
+  updateBoard(boardInput: BoardInput!, boardId: ID!): Board
+  upsertColumn(columnInput: ColumnInput!): Column
+  normalizeColumnOrder(columnIds: [ID]!): Boolean
 }
 
 type Query {

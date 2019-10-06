@@ -15,12 +15,14 @@
         <v-btn
           depressed
           color="transparent"
+          class="white--text"
           v-if="!isBoardNameEdited"
           @click="isBoardNameEdited = !isBoardNameEdited"
           >{{ currentBoard.boardname }}</v-btn
         >
         <v-text-field
           v-else
+          dark
           v-model="newBoardName"
           autofocus
           label="Regular"
@@ -29,57 +31,85 @@
       </v-flex>
     </v-layout>
     <div class="columns">
-      <Container
-        orientation="horizontal"
-        @drop="onColumnDrop($event)"
-        drag-handle-selector=".column-drag-handle"
-        class="columnsDropContainer"
-        @drag-start="dragStart"
-        :drop-placeholder="upperDropPlaceholderOptions"
-      >
-        <Draggable v-for="column in sortedColumns" :key="column.id">
-          <div class="columnContainer mx-2 px-1">
-            <div
-              class="columnContainer__header py-1 pr-2 pl-0 d-flex justify-xs-space-between"
-            >
-              <v-icon color="black" class="column-drag-handle mr-1"
-                >mdi-drag</v-icon
-              >
-              <span class="flex-grow-1 text-sm-right pr-1 font-weight-bold">
-                {{ column.name }}
-              </span>
-            </div>
-            <Container
-              group-name="col"
-              class="px-1"
-              @drop="e => onCardDrop(column.id, e)"
-              @drag-start="e => handleDragStart(e)"
-              @drag-end="e => handleDragEnd(e)"
-              :get-child-payload="getCardPayload(column.id)"
-              drag-class="card-ghost"
-              drop-class="card-ghost-drop"
-              :drop-placeholder="dropPlaceholderOptions"
-            >
-              <Draggable
-                v-for="entry in sortedEntries(column.id)"
-                :key="entry.id"
-              >
-                <v-card light class="card-container mb-2">
-                  <h4 class="pa-2">{{ entry.title }}</h4>
-                </v-card>
-              </Draggable>
-            </Container>
-            <div class="columnContainer__footer py-1 d-flex justify-xs-center">
-              <v-btn depressed class="transparent mx-auto" small color="black">
-                <v-icon color="black" size="16" class="mr-1">mdi-plus</v-icon>
-                <span class="text-xs-left pr-1 black--text">
-                  Add card
-                </span>
-              </v-btn>
-            </div>
-          </div>
-        </Draggable>
-      </Container>
+      <section>
+        <Container
+          orientation="horizontal"
+          @drop="onColumnDrop($event)"
+          drag-handle-selector=".column-drag-handle"
+          class="columnsDropContainer"
+          @drag-start="dragStart"
+          :drop-placeholder="upperDropPlaceholderOptions"
+        >
+          <v-flex xs12 sm3 class="addList">
+            <v-card light class="card-container mb-2">
+              <v-card-text class>
+                <v-text-field
+                  v-model="newColumnTitle"
+                  autofocus
+                  light
+                  append-icon="mdi-plus"
+                  label="Create a new list"
+                  placeholder="To do"
+                  @click:append="handleCreateColumn"
+                ></v-text-field>
+              </v-card-text>
+            </v-card>
+          </v-flex>
+          <template v-if="boardColumns.length">
+            <Draggable v-for="column in sortedColumns" :key="column._id">
+              <div class="columnContainer mx-2 px-1">
+                <div
+                  class="columnContainer__header py-1 pr-2 pl-0 d-flex justify-xs-space-between"
+                >
+                  <v-icon color="black" class="column-drag-handle mr-1"
+                    >mdi-drag</v-icon
+                  >
+                  <span class="flex-grow-1 text-sm-right pr-1 font-weight-bold">
+                    {{ column.title }}
+                  </span>
+                </div>
+                <Container
+                  group-name="col"
+                  class="px-1"
+                  @drop="e => onCardDrop(column._id, e)"
+                  @drag-start="e => handleDragStart(e)"
+                  @drag-end="e => handleDragEnd(e)"
+                  :get-child-payload="getCardPayload(column._id)"
+                  drag-class="card-ghost"
+                  drop-class="card-ghost-drop"
+                  :drop-placeholder="dropPlaceholderOptions"
+                >
+                  <!--<Draggable
+                    v-for="entry in sortedEntries(column.id)"
+                    :key="entry.id"
+                  >
+                    <v-card light class="card-container mb-2">
+                      <h4 class="pa-2">{{ entry.title }}</h4>
+                    </v-card>
+                  </Draggable>-->
+                </Container>
+                <div
+                  class="columnContainer__footer py-1 d-flex justify-xs-center"
+                >
+                  <v-btn
+                    depressed
+                    class="transparent mx-auto"
+                    small
+                    color="black"
+                  >
+                    <v-icon color="black" size="16" class="mr-1"
+                      >mdi-plus</v-icon
+                    >
+                    <span class="text-xs-left pr-1 black--text">
+                      Add card
+                    </span>
+                  </v-btn>
+                </div>
+              </div>
+            </Draggable>
+          </template>
+        </Container>
+      </section>
     </div>
   </div>
 </template>
@@ -89,69 +119,19 @@ import { mapActions, mapGetters } from "vuex";
 import { Container, Draggable } from "vue-smooth-dnd";
 import _ from "lodash";
 
-const board = {
-  id: "01",
-  colOrder: ["col2", "col1", "col3", "col4"],
-  columns: [
-    {
-      id: "col1",
-      name: "To Do",
-      entriesOrder: ["a2", "a1"],
-
-      entries: [{ id: "a1", title: "a1" }, { id: "a2", title: "a2" }]
-    },
-    {
-      id: "col2",
-      name: "Doing",
-      entriesOrder: ["b2", "b1"],
-      entries: [{ id: "b1", title: "b1" }, { id: "b2", title: "b2" }]
-    },
-    {
-      id: "col3",
-      name: "To review",
-      entriesOrder: ["c2", "c1", "c3", "c4"],
-      entries: [
-        { id: "c1", title: "c1" },
-        { id: "c2", title: "c2" },
-        { id: "c3", title: "c3" },
-        { id: "c4", title: "c4" }
-      ]
-    },
-    {
-      id: "col4",
-      name: "Done",
-      entriesOrder: ["d2", "d1", "d3"],
-      entries: [
-        { id: "d1", title: "d1" },
-        { id: "d2", title: "d2" },
-        { id: "d3", title: "d3" }
-      ]
-    }
-  ]
-};
-
 export default {
   name: "BoardView.vue",
   components: { Container, Draggable },
-  watch: {
-    boardColOrder: {
-      handler(newOrder, oldOrder) {
-        if (newOrder.length && oldOrder.length && newOrder !== oldOrder) {
-          //eslint-disable-next-line
-          //console.log("MUTATE WITH ORDER", newOrder, oldOrder);
-        }
-      }
-    }
-  },
+  watch: {},
   data() {
     return {
+      MAGIC_NUMBER: 1000000,
       isBoardNameEdited: false,
-
+      newColumnTitle: "",
       newBoardName: "",
-      board,
-      boardColumns: [],
       boardColOrder: [],
       entriesOrder: {},
+      columns: [],
       upperDropPlaceholderOptions: {
         className: "cards-drop-preview",
         animationDuration: "150",
@@ -165,32 +145,40 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentBoard"]),
+    ...mapGetters(["currentBoard", "boardColumns", "me"]),
+
     sortedColumns() {
-      return [...this.boardColumns].sort((colA, colB) =>
-        this.boardColOrder.indexOf(colA.id) >
-        this.boardColOrder.indexOf(colB.id)
-          ? 1
-          : -1
-      );
+      return _.sortBy(this.columns, "position");
     }
   },
   methods: {
-    ...mapActions(["getBoardById", "updateBoard"]),
+    ...mapActions([
+      "getBoardById",
+      "updateBoard",
+      "upsertColumn",
+      "normalizeColumnOrder"
+    ]),
     async handleUpdateBoardName() {
-      const boardInput = { boardname: this.newBoardName };
+      const boardInput = { boardname: this.newBoardName, owner: this.me._id };
       await this.updateBoard({ boardId: this.currentBoard._id, boardInput });
       this.isBoardNameEdited = !this.isBoardNameEdited;
     },
-    sortedEntries(columId) {
-      const column = this.boardColumns.find(col => col.id === columId);
-      const sortedEntries = [...column.entries].sort((entryA, entryB) =>
-        column.entriesOrder.indexOf(entryA.id) >
-        column.entriesOrder.indexOf(entryB.id)
-          ? 1
-          : -1
-      );
-      return sortedEntries;
+    getPosition() {
+      return !this.boardColumns.length
+        ? this.MAGIC_NUMBER
+        : this.boardColumns[this.boardColumns.length - 1].position +
+            this.MAGIC_NUMBER;
+    },
+    async handleCreateColumn() {
+      console.log(this.currentBoard);
+      const columnInput = {
+        boardId: this.currentBoard._id,
+        title: this.newColumnTitle,
+        position: this.getPosition(),
+        createdDate: new Date()
+      };
+      await this.upsertColumn({ ...columnInput });
+      this.newColumnTitle = "";
     },
     //eslint-disable-next-line
     handleDragEnd(event) {
@@ -201,20 +189,53 @@ export default {
       //console.log("drag start", event);
     },
 
-    onColumnDrop(dropResult) {
-      const { removedIndex, addedIndex } = dropResult;
-      const movedItem = this.boardColOrder[removedIndex];
-      const pulled = _.pull(
-        this.boardColOrder,
-        this.boardColOrder[removedIndex]
-      );
-      const newOrder = [
-        ...pulled.slice(0, addedIndex),
-        movedItem,
-        ...pulled.slice(addedIndex)
-      ];
+    async onColumnDrop(dropResult) {
+      //eslint-disable-next-line
+      const { removedIndex, addedIndex, ...args } = dropResult;
+      const from = removedIndex - 1;
+      const to = addedIndex - 1;
+      let newColumnPosition;
+      if (to === 0) {
+        newColumnPosition = Math.round(this.sortedColumns[0].position / 2);
+      } else if (to === this.sortedColumns.length - 1) {
+        newColumnPosition =
+          this.sortedColumns[this.sortedColumns.length - 1].position +
+          this.MAGIC_NUMBER;
+      } else if (to < from) {
+        const diff =
+          this.sortedColumns[to].position - this.sortedColumns[to - 1].position;
+        newColumnPosition = newColumnPosition = Math.round(
+          this.sortedColumns[to - 1].position + diff / 2
+        );
+      } else {
+        const diff =
+          this.sortedColumns[to + 1].position - this.sortedColumns[to].position;
+        newColumnPosition = newColumnPosition = Math.round(
+          this.sortedColumns[to].position + diff / 2
+        );
+      }
 
-      this.boardColOrder = newOrder;
+      const boardId = this.currentBoard._id;
+      //eslint-disable-next-line
+      const { _id, title, position, ...columnFields } = this.sortedColumns[
+        from
+      ];
+      const columnInput = {
+        _id,
+        title,
+        boardId,
+        position: newColumnPosition
+      };
+      this.updateColumnPosition({ ...columnInput });
+      await this.upsertColumn({ columnInput });
+    },
+
+    updateColumnPosition({ _id, position }) {
+      const colToUpdateIndex = this.columns.findIndex(c => c._id === _id);
+      this.$set(this.columns, colToUpdateIndex, {
+        ...this.columns[colToUpdateIndex],
+        position
+      });
     },
 
     onCardDrop(columnId, dropResult) {
@@ -238,7 +259,7 @@ export default {
     getCardPayload(columnId) {
       return index => {
         return {
-          item: this.sortedEntries(columnId)[index],
+          item: this.boardColumns[index],
           origin: columnId
         };
       };
@@ -296,11 +317,13 @@ export default {
     const { id } = this.$route.params;
     await this.getBoardById(id);
     this.newBoardName = this.currentBoard.boardname;
-    this.boardColOrder = this.board.colOrder;
-    this.boardColumns = this.board.columns;
-    this.entriesOrder = this.board.columns.reduce((entriesOrder, col) => {
-      return _.merge(entriesOrder, { [col.id]: col.entriesOrder });
-    }, {});
+    if (this.currentBoard.columns) {
+      this.columns = this.currentBoard.columns;
+    }
+  },
+  async beforeDestroy() {
+    const columnIds = this.sortedColumns.map(({ _id }) => _id);
+    await this.normalizeColumnOrder({ columnIds });
   }
 };
 </script>
@@ -309,10 +332,14 @@ export default {
 .boardView
   background-size cover
   .columns
+    .addList
+      min-width 200px
+      max-width 200px
     .columnsDropContainer
       min-width 100%
       display flex
       overflow-x auto
+      min-height 60vh
     .columnContainer
       border-radius 5px
       background-color #EBECF0

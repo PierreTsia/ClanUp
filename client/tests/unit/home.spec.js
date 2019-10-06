@@ -26,7 +26,7 @@ describe("Home.vue", () => {
     expect(wrapper).toBeDefined();
   });
 
-/*  it("should call get boards query on mounted", () => {
+  /*  it("should call get boards query on mounted", () => {
     expect(actions.getMyBoards).toHaveBeenCalled();
   });*/
 

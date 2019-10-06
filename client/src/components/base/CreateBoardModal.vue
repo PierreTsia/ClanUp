@@ -86,6 +86,7 @@
 <script>
 import _ from "lodash";
 import Pill from "@/components/base/Pill.vue";
+import { mapGetters } from "vuex";
 export default {
   name: "CreateBoardModal",
   props: {
@@ -134,6 +135,7 @@ export default {
       }
     };
   },
+  computed: { ...mapGetters(["me"]) },
   methods: {
     handleClickOutside() {
       this.$emit("onClickOutside");
@@ -156,6 +158,7 @@ export default {
       const boardinput = _.pickBy({
         boardname: this.boardname,
         description: this.description,
+        owner: this.me._id,
         ...this.activeBackground
       });
       if (this.noFieldsAreMissing(boardinput)) {

@@ -25,6 +25,11 @@ export const GET_BOARD_BY_ID = gql`
         _id
         username
       }
+      columns {
+        _id
+        title
+        position
+      }
     }
   }
 `;
@@ -65,5 +70,24 @@ export const UPDATE_BOARD = gql`
 export const DELETE_BOARD = gql`
   mutation($boardId: ID!) {
     deleteBoard(boardId: $boardId)
+  }
+`;
+
+export const UPSERT_COLUMN = gql`
+  mutation($columnInput: ColumnInput!) {
+    upsertColumn(columnInput: $columnInput) {
+      _id
+      title
+      boardId
+      position
+      author {
+        _id
+      }
+    }
+  }
+`;
+export const NORMALIZE_COLUMNS_ORDER = gql`
+  mutation($columnIds: [ID]!) {
+    normalizeColumnOrder(columnIds: $columnIds)
   }
 `;

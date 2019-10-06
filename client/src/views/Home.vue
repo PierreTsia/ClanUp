@@ -34,7 +34,6 @@ export default {
     ...mapActions(["getMyBoards"])
   },
   async mounted() {
-    console.log("ici?");
     // await this.getMyBoards();
   }
 };

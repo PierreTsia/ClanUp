@@ -41,7 +41,7 @@ module.exports = {
     },
 
     //BOARDS
-    createBoard: async (_, { boardInput }, { User, Board, currentUser }) => {
+    createBoard: async (_, { boardInput }, { Board, currentUser }) => {
       if (!currentUser) {
         throw Error("Only authenticated users can create boards");
       }
@@ -54,7 +54,7 @@ module.exports = {
       return board;
     },
 
-    deleteBoard: async (_, { boardId }, { Board, currentUser }) => {
+    deleteBoard: async (_, { boardId }, { Board, Column, currentUser }) => {
       if (!currentUser) {
         throw Error("Authentication required");
       }
@@ -66,7 +66,7 @@ module.exports = {
       if (!boardToDelete.owner.equals(currentUser._id)) {
         throw Error("Only owner can delete a board");
       }
-
+      await Column.deleteMany({ boardId });
       await Board.deleteOne({ _id: boardToDelete._id });
       return boardToDelete._id;
     },
@@ -99,6 +99,69 @@ module.exports = {
       ).populate([{ path: "owner", model: "User" }]);
 
       return updatedBoard;
+    },
+
+    normalizeColumnOrder: async (_, { columnIds }, { currentUser, Column }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+      const MAGIC_NUMBER = 1000000;
+      for (const [i, colId] of columnIds.entries()) {
+        const newPosition = i * MAGIC_NUMBER;
+        await Column.findOneAndUpdate(
+          { _id: colId },
+          { position: newPosition },
+          { new: true }
+        );
+      }
+    },
+    upsertColumn: async (
+      _,
+      { columnInput },
+      { currentUser, Board, Column }
+    ) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+
+      const board = await Board.findById(columnInput.boardId);
+
+      if (!board) {
+        throw Error(`No board found with id ${columnInput.boardId}`);
+      }
+
+      if (!board.owner.equals(currentUser._id)) {
+        throw Error("Only owner can update a board");
+      }
+
+      if (columnInput._id) {
+        const columnToUpdate = await Column.findById(columnInput._id);
+        if (!columnToUpdate) {
+          throw Error(`No Column found with id ${columnInput._id}`);
+        }
+
+        const { _id, ...fields } = columnInput;
+        const updatedColumn = await Column.findOneAndUpdate(
+          { _id },
+          { ...fields },
+          { new: true }
+        ).populate([{ path: "author", model: "User" }]);
+
+        return updatedColumn;
+      } else {
+        const newColumn = await new Column({
+          ...columnInput,
+          author: currentUser._id
+        }).save();
+
+        await Board.findOneAndUpdate(
+          { _id: columnInput.boardId },
+          { $addToSet: { columns: newColumn._id } },
+          { new: true }
+        );
+
+        return newColumn;
+      }
     }
   },
   /*
@@ -139,6 +202,7 @@ module.exports = {
       try {
         const boards = await Board.find()
           .where({ owner: currentUser })
+          .populate([{ path: "columns", model: "Column" }])
           .sort({ createdDate: -1 });
 
         return boards;
@@ -147,14 +211,20 @@ module.exports = {
       }
     },
 
-    getBoardById: async (_, { boardId }, { Board, User, currentUser }) => {
+    getBoardById: async (_, { boardId }, { Board, Column, currentUser }) => {
       if (!currentUser) {
         throw Error("Authentication required");
       }
-      const board = await Board.findById(boardId).populate({
-        path: "owner",
-        model: "User"
-      });
+      const board = await Board.findById(boardId).populate([
+        {
+          path: "owner",
+          model: "User"
+        },
+        {
+          path: "columns",
+          model: "Column"
+        }
+      ]);
       if (!board) {
         throw Error("No board found");
       }
@@ -166,4 +236,6 @@ module.exports = {
       return board;
     }
   }
+
+  //Columns
 };

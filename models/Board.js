@@ -14,6 +14,10 @@ const BoardSchema = new mongoose.Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: "User"
   },
+  columns: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Column"
+  },
   description: {
     type: String,
     required: true
