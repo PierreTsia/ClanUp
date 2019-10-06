@@ -34,7 +34,6 @@ export const actions = {
       const { data } = await apolloClient.query({
         query: GET_MYBOARDS
       });
-      console.log("data", data);
       commit(types.SET_BOARDS_SUCCESS, data.getMyBoards);
     } catch ({ message }) {
       console.warn(message);
@@ -88,6 +87,7 @@ export const actions = {
         variables: payload
       });
       commit(types.UPSERT_COLUMN_SUCCESS, data.upsertColumn);
+      return data.upsertColumn;
     } catch (e) {
       console.warn(e);
     }

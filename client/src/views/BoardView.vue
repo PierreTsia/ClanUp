@@ -177,7 +177,8 @@ export default {
         position: this.getPosition(),
         createdDate: new Date()
       };
-      await this.upsertColumn({ ...columnInput });
+      const column = await this.upsertColumn({ columnInput });
+      this.columns = [column, ...this.columns];
       this.newColumnTitle = "";
     },
     //eslint-disable-next-line

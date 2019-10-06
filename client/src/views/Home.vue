@@ -34,7 +34,7 @@ export default {
     ...mapActions(["getMyBoards"])
   },
   async mounted() {
-    // await this.getMyBoards();
+   // await this.getMyBoards();
   }
 };
 </script>
