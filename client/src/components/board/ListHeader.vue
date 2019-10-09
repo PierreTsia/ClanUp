@@ -52,6 +52,6 @@ export default {
     position relative
     .v-icon
         cursor grab
-        &: active
-          cursor  grabbing;
+        &:active
+          cursor grabbing;
 </style>
