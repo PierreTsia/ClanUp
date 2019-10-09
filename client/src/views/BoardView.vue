@@ -15,7 +15,7 @@
         <v-btn
           depressed
           color="transparent"
-          class="white--text"
+          class="white--text boardView__top__edit"
           v-if="!isBoardNameEdited"
           @click="isBoardNameEdited = !isBoardNameEdited"
           >{{ currentBoard.boardname }}</v-btn
@@ -23,6 +23,7 @@
         <v-text-field
           v-else
           dark
+          class="boardView__top__input"
           v-model="newBoardName"
           autofocus
           label="Regular"
@@ -58,16 +59,17 @@
           <template v-if="boardColumns.length">
             <Draggable v-for="column in sortedColumns" :key="column._id">
               <div class="columnContainer mx-2 px-1">
-                <div
-                  class="columnContainer__header py-1 pr-2 pl-0 d-flex justify-xs-space-between"
-                >
-                  <v-icon color="black" class="column-drag-handle mr-1"
-                    >mdi-drag</v-icon
-                  >
-                  <span class="flex-grow-1 text-sm-right pr-1 font-weight-bold">
-                    {{ column.title }}
-                  </span>
-                </div>
+                <ListHeader
+                  :title="column.title"
+                  :menuItems="items"
+                  @onSelectClick="
+                    menuItemId =>
+                      handleMenuSelectClick({
+                        columnId: column._id,
+                        menuItemId
+                      })
+                  "
+                />
                 <Container
                   group-name="col"
                   class="px-1"
@@ -88,23 +90,9 @@
                     </v-card>
                   </Draggable>-->
                 </Container>
-                <div
-                  class="columnContainer__footer py-1 d-flex justify-xs-center"
-                >
-                  <v-btn
-                    depressed
-                    class="transparent mx-auto"
-                    small
-                    color="black"
-                  >
-                    <v-icon color="black" size="16" class="mr-1"
-                      >mdi-plus</v-icon
-                    >
-                    <span class="text-xs-left pr-1 black--text">
-                      Add card
-                    </span>
-                  </v-btn>
-                </div>
+
+                <!--TODO COMPONENT-->
+                <ListFooter />
               </div>
             </Draggable>
           </template>
@@ -117,14 +105,26 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import { Container, Draggable } from "vue-smooth-dnd";
+import ListHeader from "@/components/board/ListHeader";
+import ListFooter from "@/components/board/ListFooter";
+
 import _ from "lodash";
 
 export default {
   name: "BoardView.vue",
-  components: { Container, Draggable },
-  watch: {},
+  components: { Container, Draggable, ListHeader, ListFooter },
+  watch: {
+    boardColumns: {
+      handler(newColumns, oldColumns) {
+        if (oldColumns.length && newColumns.length !== oldColumns.length) {
+          this.columns = newColumns;
+        }
+      }
+    }
+  },
   data() {
     return {
+      items: [{ id: "delete", title: "delete list", icon: "trash" }],
       MAGIC_NUMBER: 1000000,
       isBoardNameEdited: false,
       newColumnTitle: "",
@@ -156,9 +156,17 @@ export default {
       "getBoardById",
       "updateBoard",
       "upsertColumn",
-      "normalizeColumnOrder"
+      "normalizeColumnOrder",
+      "deleteColumn"
     ]),
+
+    async handleMenuSelectClick({ menuItemId, columnId }) {
+      if (menuItemId === "delete") {
+        await this.deleteColumn({ columnId });
+      }
+    },
     async handleUpdateBoardName() {
+      console.log("salutttt");
       const boardInput = { boardname: this.newBoardName, owner: this.me._id };
       await this.updateBoard({ boardId: this.currentBoard._id, boardInput });
       this.isBoardNameEdited = !this.isBoardNameEdited;
@@ -346,11 +354,13 @@ export default {
       background-color #EBECF0
       color #314261
       width 200px
-      .columnContainer__header
+
+      .columnHeader__menu
+        position absolute
+        right -5px
+        top -1px
         .v-icon
-          cursor grab
-          &:active
-            cursor grabbing
+          cursor pointer
       .card-container
           cursor grab
 </style>

@@ -1,0 +1,46 @@
+{
+  "_id": "5d99cfdb6841127b471c4c61",
+  "boardname": "one million columns baby",
+  "description": "The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through.",
+  "createdDate": "Sun Oct 06 2019 13:28:27 GMT+0200 (Central European Summer Time)",
+  "color": "#001A29",
+  "coverImg": null,
+  "owner": {
+    "_id": "5d8622c8368bc87dd6a44b8c",
+    "username": "pierre_Tsia",
+    "__typename": "User"
+  },
+  "columns": [
+    {
+      "_id": "5d99cfe36841127b471c4c62",
+      "title": "todo",
+      "position": 3000000,
+      "__typename": "Column"
+    },
+    {
+      "_id": "5d99cfe76841127b471c4c63",
+      "title": "doing",
+      "position": 0,
+      "__typename": "Column"
+    },
+    {
+      "_id": "5d99cff06841127b471c4c64",
+      "title": "to review",
+      "position": 2000000,
+      "__typename": "Column"
+    },
+    {
+      "_id": "5d99cff46841127b471c4c65",
+      "title": "done",
+      "position": 1000000,
+      "__typename": "Column"
+    },
+    {
+      "_id": "5d99f583a3daf911711fed51",
+      "title": "merged",
+      "position": 4000000,
+      "__typename": "Column"
+    }
+  ],
+  "__typename": "Board"
+}

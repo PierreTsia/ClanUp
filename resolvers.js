@@ -162,6 +162,33 @@ module.exports = {
 
         return newColumn;
       }
+    },
+
+    deleteColumn: async (_, { columnId }, { Column, Board, currentUser }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+
+      const columnToDelete = await Column.findById(columnId);
+
+      if (!columnToDelete) {
+        throw Error("No column found");
+      }
+
+      const board = await Board.findById(columnToDelete.boardId);
+
+      if (!board) {
+        throw Error("No board found");
+      }
+
+      if (!board.owner.equals(currentUser._id)) {
+        throw Error("Only owner can update a board");
+      }
+
+      const deleted = await Column.deleteOne({ _id: columnId });
+      if (deleted) {
+        return columnId;
+      }
     }
   },
   /*

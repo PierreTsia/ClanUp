@@ -91,3 +91,9 @@ export const NORMALIZE_COLUMNS_ORDER = gql`
     normalizeColumnOrder(columnIds: $columnIds)
   }
 `;
+
+export const DELETE_COLUMN = gql`
+  mutation($columnId: ID!) {
+    deleteColumn(columnId: $columnId)
+  }
+`;
