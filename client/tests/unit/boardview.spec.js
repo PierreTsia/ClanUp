@@ -26,7 +26,7 @@ describe("Boards.vue", () => {
   };
 
   beforeEach(() => {
-    /*  jest.spyOn(actions, "openModal");*/
+    jest.spyOn(actions, "openModal");
     wrapper = shallowMount(BoardView, {
       /*propsData: {
         boards
@@ -67,17 +67,31 @@ describe("Boards.vue", () => {
   });
 
   it("should display a text field if in edit mode", async () => {
-    jest.spyOn(actions, "updateBoard");
     const textField = wrapper.find(TextFieldStub);
     expect(textField.exists()).toBe(true);
+  });
+
+  it("should allow user to create a new column", async () => {
+    jest.spyOn(actions, "upsertColumn");
+    wrapper.setData({ newColumnTitle: "test-1" });
+    wrapper.vm.handleCreateColumn();
+    await wrapper.vm.$nextTick();
+    expect(actions.upsertColumn).toHaveBeenCalledWith(
+      expect.any(Object),
+      {
+        columnInput
+      },
+      undefined
+    );
   });
 });
 
 const actions = {
-  openModal: () => jest.fn(),
-  closeModal: () => jest.fn(),
-  getBoardById: () => jest.fn(),
-  updateBoard: () => jest.fn()
+  openModal: jest.fn(),
+  closeModal: jest.fn(),
+  getBoardById: jest.fn(),
+  updateBoard: jest.fn(),
+  upsertColumn: jest.fn()
 };
 
 const getStore = () =>
@@ -87,6 +101,49 @@ const getStore = () =>
     getters: {
       me: () => {},
       currentBoard: () => currentBoardMock,
-      boardColumns: () => []
+      boardColumns: () => mockColumns
     }
   });
+
+const mockColumns = [
+  {
+    _id: "5dab0297d5c1306a8a6eb5e5",
+    title: "dfs",
+    boardId: "5d99cfdb6841127b471c4c61",
+    position: 1000000,
+    author: {
+      _id: "5d8622c8368bc87dd6a44b8c",
+      __typename: "User"
+    },
+    __typename: "Column"
+  },
+  {
+    _id: "5da1e7ed97280c27b9c9e829",
+    title: "pt2kos@gmail.com",
+    boardId: "5d99cfdb6841127b471c4c61",
+    position: 2000000,
+    author: {
+      _id: "5d8622c8368bc87dd6a44b8c",
+      __typename: "User"
+    },
+    __typename: "Column"
+  },
+  {
+    _id: "5da1e7ff97280c27b9c9e82a",
+    title: "user2@mail.com",
+    boardId: "5d99cfdb6841127b471c4c61",
+    position: 5000000,
+    author: {
+      _id: "5d8622c8368bc87dd6a44b8c",
+      __typename: "User"
+    },
+    __typename: "Column"
+  }
+];
+
+const columnInput = {
+  boardId: "5d99cfdb6841127b471c4c61",
+  createdDate: expect.any(Date),
+  position: 6000000,
+  title: "test-1"
+};

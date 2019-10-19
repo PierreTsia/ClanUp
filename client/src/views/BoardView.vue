@@ -61,6 +61,7 @@
               <div class="columnContainer mx-2 px-1">
                 <ListHeader
                   :title="column.title"
+                  :isTitleEdited="isTitleEdited(column._id)"
                   :menuItems="items"
                   @onSelectClick="
                     menuItemId =>
@@ -116,17 +117,21 @@ export default {
   watch: {
     boardColumns: {
       handler(newColumns, oldColumns) {
-        if (oldColumns.length && newColumns.length !== oldColumns.length) {
-          this.columns = newColumns;
+        if (oldColumns && newColumns.length !== oldColumns.length) {
+          this.columns = [...newColumns];
         }
       }
     }
   },
   data() {
     return {
-      items: [{ id: "delete", title: "delete list", icon: "trash" }],
+      items: [
+        { id: "edit", title: "Edit list title", icon: "pencil" },
+        { id: "delete", title: "Delete list", icon: "delete" }
+      ],
       MAGIC_NUMBER: 1000000,
       isBoardNameEdited: false,
+      editedTitleColumnId: null,
       newColumnTitle: "",
       newBoardName: "",
       boardColOrder: [],
@@ -160,33 +165,37 @@ export default {
       "deleteColumn"
     ]),
 
+    isTitleEdited(columnId) {
+      return this.editedTitleColumnId === columnId;
+    },
+
     async handleMenuSelectClick({ menuItemId, columnId }) {
       if (menuItemId === "delete") {
         await this.deleteColumn({ columnId });
+      } else if (menuItemId === "edit") {
+        console.log("edit");
+        this.editedTitleColumnId = columnId;
       }
     },
     async handleUpdateBoardName() {
-      console.log("salutttt");
       const boardInput = { boardname: this.newBoardName, owner: this.me._id };
       await this.updateBoard({ boardId: this.currentBoard._id, boardInput });
       this.isBoardNameEdited = !this.isBoardNameEdited;
     },
-    getPosition() {
+    lastPosition() {
       return !this.boardColumns.length
         ? this.MAGIC_NUMBER
         : this.boardColumns[this.boardColumns.length - 1].position +
             this.MAGIC_NUMBER;
     },
     async handleCreateColumn() {
-      console.log(this.currentBoard);
       const columnInput = {
         boardId: this.currentBoard._id,
         title: this.newColumnTitle,
-        position: this.getPosition(),
+        position: this.lastPosition(),
         createdDate: new Date()
       };
-      const column = await this.upsertColumn({ columnInput });
-      this.columns = [column, ...this.columns];
+      await this.upsertColumn({ columnInput });
       this.newColumnTitle = "";
     },
     //eslint-disable-next-line
@@ -198,18 +207,12 @@ export default {
       //console.log("drag start", event);
     },
 
-    async onColumnDrop(dropResult) {
-      //eslint-disable-next-line
-      const { removedIndex, addedIndex, ...args } = dropResult;
-      const from = removedIndex - 1;
-      const to = addedIndex - 1;
+    getNewColumnPosition(to, from) {
       let newColumnPosition;
       if (to === 0) {
         newColumnPosition = Math.round(this.sortedColumns[0].position / 2);
       } else if (to === this.sortedColumns.length - 1) {
-        newColumnPosition =
-          this.sortedColumns[this.sortedColumns.length - 1].position +
-          this.MAGIC_NUMBER;
+        newColumnPosition = this.lastPosition();
       } else if (to < from) {
         const diff =
           this.sortedColumns[to].position - this.sortedColumns[to - 1].position;
@@ -224,6 +227,15 @@ export default {
         );
       }
 
+      return newColumnPosition;
+    },
+
+    async onColumnDrop(dropResult) {
+      //eslint-disable-next-line
+      const { removedIndex, addedIndex, ...args } = dropResult;
+      const from = removedIndex - 1;
+      const to = addedIndex - 1;
+      const newColumnPosition = this.getNewColumnPosition(to, from);
       const boardId = this.currentBoard._id;
       //eslint-disable-next-line
       const { _id, title, position, ...columnFields } = this.sortedColumns[
@@ -262,9 +274,11 @@ export default {
         this.addCardToColumn({ payload, addedIndex, columnId });
       }
     },
+
     dragStart() {
       //  console.log("drag started");
     },
+
     getCardPayload(columnId) {
       return index => {
         return {
@@ -273,6 +287,7 @@ export default {
         };
       };
     },
+
     moveCardInsideSameColumn({ payload, removedIndex, addedIndex }) {
       const column = this.boardColumns.find(col => col.id === payload.origin);
       const movedItem = column.entriesOrder[removedIndex];
@@ -289,6 +304,7 @@ export default {
 
       column.entriesOrder = newOrder;
     },
+
     removeCardFromColumn({ removedIndex, columnId }) {
       const columnIndex = this.boardColumns.findIndex(
         col => col.id === columnId

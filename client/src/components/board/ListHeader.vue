@@ -8,9 +8,13 @@
       justify-xs-space-between"
   >
     <v-icon color="black" class="column-drag-handle mr-1">mdi-drag</v-icon>
-    <span class="flex-grow-1 text-sm-right pr-1 font-weight-bold pr-5">
+    <span
+      v-if="!isTitleEdited"
+      class="flex-grow-1 text-sm-right pr-1 font-weight-bold pr-5"
+    >
       {{ title }}
     </span>
+    <span v-else>pouet</span>
     <v-menu bottom :offset-y="true">
       <template v-slot:activator="{ on }">
         <v-btn class="columnHeader__menu" light icon v-on="on">
@@ -24,7 +28,10 @@
           :key="i"
           @click="$emit('onSelectClick', item.id)"
         >
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
+          <v-list-item-title>
+            <v-icon size="16" class="mr-1">{{ `mdi-${item.icon}` }}</v-icon
+            >{{ item.title }}</v-list-item-title
+          >
         </v-list-item>
       </v-list>
     </v-menu>
@@ -38,6 +45,10 @@ export default {
     title: {
       type: String,
       default: ""
+    },
+    isTitleEdited: {
+      type: Boolean,
+      default: false
     },
     menuItems: {
       type: Array,

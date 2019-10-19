@@ -74,7 +74,6 @@ export const mutations = {
     }
   },
   [types.DELETE_COLUMN_SUCCESS]: (state, columnId) => {
-    console.log("columnId", columnId);
     state.currentBoardColumns = state.currentBoardColumns.filter(
       c => c._id !== columnId
     );
