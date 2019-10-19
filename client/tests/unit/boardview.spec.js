@@ -5,16 +5,20 @@ import Vue from "vue";
 import Vuex from "vuex";
 import Vuetify from "vuetify";
 import VueRouter from "vue-router";
+import ListHeader from "@/components/board/ListHeader";
+
 Vue.use(Vuetify);
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import jest from "jest-mock";
+
+import createStub from "./support/createStubWithProps";
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 localVue.use(VueRouter);
 
 const router = new VueRouter();
-describe("Boards.vue", () => {
+describe("BoardView.vue", () => {
   let wrapper;
 
   const BtnStub = {
@@ -34,7 +38,8 @@ describe("Boards.vue", () => {
       localVue,
       stubs: {
         VBtn: BtnStub,
-        VTextField: TextFieldStub
+        VTextField: TextFieldStub,
+        ListHeader: createStub(ListHeader)
       },
       router,
       store: getStore()
@@ -84,6 +89,35 @@ describe("Boards.vue", () => {
       undefined
     );
   });
+  it("shoud instantiate a Listheader component per column and pass title as prop", async () => {
+    const headers = wrapper.findAll(ListHeader);
+    expect(headers.length).toBe(wrapper.vm.columns.length);
+    const expectedTitles = wrapper.vm.columns.map(({ title }) => title);
+    [...Array(headers.length).keys()].forEach(index => {
+      expect(expectedTitles.includes(headers.at(index).props().title)).toBe(
+        true
+      );
+    });
+  });
+
+  it("should set a ListHeader to edit mode if edit click is emitted", async () => {
+    const headers = wrapper.findAll(ListHeader);
+    headers.at(1).vm.$emit("onSelectClick", "edit");
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.editedTitleColumnId).toBe(mockColumns[3]._id);
+    [...Array(headers.length).keys()].forEach(index => {
+      if (index === 1) {
+        expect(headers.at(index).props().isTitleEdited).toBe(true);
+      } else {
+        expect(headers.at(index).props().isTitleEdited).toBe(false);
+      }
+    });
+  });
+  /* it("shoud allow user to update column title", async () => {
+    jest.spyOn(actions, "updateColumnTitle");
+    wrapper
+
+  })*/
 });
 
 const actions = {
@@ -91,7 +125,8 @@ const actions = {
   closeModal: jest.fn(),
   getBoardById: jest.fn(),
   updateBoard: jest.fn(),
-  upsertColumn: jest.fn()
+  upsertColumn: jest.fn(),
+  updateColumnTitle: jest.fn()
 };
 
 const getStore = () =>
@@ -107,36 +142,33 @@ const getStore = () =>
 
 const mockColumns = [
   {
-    _id: "5dab0297d5c1306a8a6eb5e5",
-    title: "dfs",
-    boardId: "5d99cfdb6841127b471c4c61",
-    position: 1000000,
-    author: {
-      _id: "5d8622c8368bc87dd6a44b8c",
-      __typename: "User"
-    },
+    _id: "5d99cfe36841127b471c4c62",
+    title: "todo",
+    position: 3000000,
     __typename: "Column"
   },
   {
-    _id: "5da1e7ed97280c27b9c9e829",
-    title: "pt2kos@gmail.com",
-    boardId: "5d99cfdb6841127b471c4c61",
+    _id: "5d99cfe76841127b471c4c63",
+    title: "doing",
+    position: 0,
+    __typename: "Column"
+  },
+  {
+    _id: "5d99cff06841127b471c4c64",
+    title: "to review",
     position: 2000000,
-    author: {
-      _id: "5d8622c8368bc87dd6a44b8c",
-      __typename: "User"
-    },
     __typename: "Column"
   },
   {
-    _id: "5da1e7ff97280c27b9c9e82a",
-    title: "user2@mail.com",
-    boardId: "5d99cfdb6841127b471c4c61",
-    position: 5000000,
-    author: {
-      _id: "5d8622c8368bc87dd6a44b8c",
-      __typename: "User"
-    },
+    _id: "5d99cff46841127b471c4c65",
+    title: "done",
+    position: 1000000,
+    __typename: "Column"
+  },
+  {
+    _id: "5d99f583a3daf911711fed51",
+    title: "merged",
+    position: 4000000,
     __typename: "Column"
   }
 ];
@@ -144,6 +176,6 @@ const mockColumns = [
 const columnInput = {
   boardId: "5d99cfdb6841127b471c4c61",
   createdDate: expect.any(Date),
-  position: 6000000,
+  position: 5000000,
   title: "test-1"
 };

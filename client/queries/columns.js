@@ -25,3 +25,12 @@ export const DELETE_COLUMN = gql`
     deleteColumn(columnId: $columnId)
   }
 `;
+
+export const UPDATE_COLUMN_TITLE = gql`
+  mutation($columnId: ID!, $title: String!) {
+    updateColumnTitle(columnId: $columnId, title: $title) {
+      _id
+      title
+    }
+  }
+`;

@@ -115,6 +115,35 @@ module.exports = {
         );
       }
     },
+
+    updateColumnTitle: async (
+      _,
+      { columnId, title },
+      { Column, currentUser }
+    ) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+
+      const columnToUpdate = await Column.findById(columnId);
+
+      if (!columnToUpdate) {
+        throw Error("No list found");
+      }
+
+      if (!columnToUpdate.author.equals(currentUser._id)) {
+        throw Error("Only author can make updates");
+      }
+
+      const updatedColumn = await Column.findOneAndUpdate(
+        { _id: columnId },
+        { title },
+        { new: true }
+      ).populate([{ path: "author", model: "User" }]);
+
+      return updatedColumn;
+    },
+
     upsertColumn: async (
       _,
       { columnInput },

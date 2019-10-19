@@ -7,14 +7,26 @@
       d-flex
       justify-xs-space-between"
   >
-    <v-icon color="black" class="column-drag-handle mr-1">mdi-drag</v-icon>
+    <v-icon
+      v-show="!isTitleEdited"
+      color="black"
+      class="column-drag-handle mr-1"
+      >mdi-drag</v-icon
+    >
     <span
       v-if="!isTitleEdited"
       class="flex-grow-1 text-sm-right pr-1 font-weight-bold pr-5"
     >
       {{ title }}
     </span>
-    <span v-else>pouet</span>
+    <v-text-field
+      v-else
+      light
+      class="py-0 pl-1"
+      v-model="newColumnTitle"
+      autofocus
+      @blur="$emit('onTitleChange', newColumnTitle)"
+    ></v-text-field>
     <v-menu bottom :offset-y="true">
       <template v-slot:activator="{ on }">
         <v-btn class="columnHeader__menu" light icon v-on="on">
@@ -54,6 +66,21 @@ export default {
       type: Array,
       default: () => []
     }
+  },
+  watch: {
+    title: {
+      immediate: true,
+      handler(title) {
+        if (title && title.length) {
+          this.newColumnTitle = title;
+        }
+      }
+    }
+  },
+  data() {
+    return {
+      newColumnTitle: ""
+    };
   }
 };
 </script>

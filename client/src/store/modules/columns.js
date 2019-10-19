@@ -4,7 +4,8 @@ import { defaultClient as apolloClient } from "../../main";
 import {
   UPSERT_COLUMN,
   NORMALIZE_COLUMNS_ORDER,
-  DELETE_COLUMN
+  DELETE_COLUMN,
+  UPDATE_COLUMN_TITLE
 } from "../../../queries";
 export const state = {
   currentBoardColumns: [],
@@ -52,6 +53,17 @@ export const actions = {
     } catch (e) {
       console.warn(e);
     }
+  },
+  updateColumnTitle: async ({ commit }, payload) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_COLUMN_TITLE,
+        variables: payload
+      });
+      commit(types.UPDATE_COLUMN_TITLE_SUCCESS, data.updateColumnTitle);
+    } catch (e) {
+      console.warn(e);
+    }
   }
 };
 
@@ -77,6 +89,16 @@ export const mutations = {
     state.currentBoardColumns = state.currentBoardColumns.filter(
       c => c._id !== columnId
     );
+  },
+  [types.UPDATE_COLUMN_TITLE_SUCCESS]: (state, column) => {
+    const columnIndex = state.currentBoardColumns.findIndex(
+      c => c._id === column._id
+    );
+
+    state.currentBoardColumns[columnIndex] = {
+      ...state.currentBoardColumns[columnIndex],
+      title: column.title
+    };
   }
 };
 

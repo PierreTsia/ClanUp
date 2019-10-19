@@ -63,6 +63,9 @@
                   :title="column.title"
                   :isTitleEdited="isTitleEdited(column._id)"
                   :menuItems="items"
+                  @onTitleChange="
+                    newTitle => handleTitleChange(newTitle, column._id)
+                  "
                   @onSelectClick="
                     menuItemId =>
                       handleMenuSelectClick({
@@ -160,6 +163,7 @@ export default {
     ...mapActions([
       "getBoardById",
       "updateBoard",
+      "updateColumnTitle",
       "upsertColumn",
       "normalizeColumnOrder",
       "deleteColumn"
@@ -168,12 +172,25 @@ export default {
     isTitleEdited(columnId) {
       return this.editedTitleColumnId === columnId;
     },
+    async handleTitleChange(newTitle, columnId) {
+      try {
+        await this.updateColumnTitle({ columnId, title: newTitle });
+        const indexToUpdate = this.columns.findIndex(c => c._id === columnId);
 
+        this.$set(this.columns, indexToUpdate, {
+          ...this.columns[indexToUpdate],
+          title: newTitle
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+
+      this.editedTitleColumnId = "";
+    },
     async handleMenuSelectClick({ menuItemId, columnId }) {
       if (menuItemId === "delete") {
         await this.deleteColumn({ columnId });
       } else if (menuItemId === "edit") {
-        console.log("edit");
         this.editedTitleColumnId = columnId;
       }
     },
