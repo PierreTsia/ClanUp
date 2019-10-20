@@ -8,6 +8,15 @@ export const GET_MYBOARDS = gql`
       coverImg
       color
       createdDate
+      columns {
+        _id
+        title
+        cards {
+          _id
+          title
+          position
+        }
+      }
     }
   }
 `;
@@ -29,6 +38,14 @@ export const GET_BOARD_BY_ID = gql`
         _id
         title
         position
+        cards {
+          _id
+          title
+          position
+          columnId {
+            _id
+          }
+        }
       }
     }
   }

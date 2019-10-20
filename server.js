@@ -4,7 +4,6 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const Board = require("./models/Board");
-
 const Column = require("./models/Column");
 const Card = require("./models/Card");
 
@@ -21,7 +20,7 @@ mongoose
     useFindAndModify: false
   })
   .then(() => {
-    console.log(" Database connected");
+    console.log("Database connected");
   })
   .catch(e => {
     console.log(e);

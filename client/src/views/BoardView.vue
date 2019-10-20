@@ -85,18 +85,28 @@
                   drop-class="card-ghost-drop"
                   :drop-placeholder="dropPlaceholderOptions"
                 >
-                  <!--<Draggable
-                    v-for="entry in sortedEntries(column.id)"
-                    :key="entry.id"
+                  <Draggable
+                    v-for="card in sortedByPosition(
+                      cardsByColumnsId[column._id]
+                    )"
+                    :key="card._id"
                   >
                     <v-card light class="card-container mb-2">
-                      <h4 class="pa-2">{{ entry.title }}</h4>
+                      <h4 class="pa-2">{{ card.title }}</h4>
                     </v-card>
-                  </Draggable>-->
+                  </Draggable>
                 </Container>
 
                 <!--TODO COMPONENT-->
-                <ListFooter />
+                <ListFooter
+                  :isEditing="isNewCardEditingColumnId === column._id"
+                  @onCancel="isNewCardEditingColumnId = null"
+                  @onEditCardClick="setEditedCard(column._id)"
+                  @onCardCreate="
+                    ({ title }) =>
+                      handleCreateCard({ title, columnId: column._id })
+                  "
+                />
               </div>
             </Draggable>
           </template>
@@ -108,6 +118,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { sortBy } from "lodash";
 import { Container, Draggable } from "vue-smooth-dnd";
 import ListHeader from "@/components/board/ListHeader";
 import ListFooter from "@/components/board/ListFooter";
@@ -124,6 +135,15 @@ export default {
           this.columns = [...newColumns];
         }
       }
+    },
+    currentBoardCards: {
+      deep: true,
+      handler(boardCards) {
+        this.cardsByColumnsId = _.groupBy(
+          boardCards,
+          card => card.columnId._id
+        );
+      }
     }
   },
   data() {
@@ -134,12 +154,14 @@ export default {
       ],
       MAGIC_NUMBER: 1000000,
       isBoardNameEdited: false,
+      isNewCardEditingColumnId: null,
       editedTitleColumnId: null,
       newColumnTitle: "",
       newBoardName: "",
       boardColOrder: [],
       entriesOrder: {},
       columns: [],
+      cardsByColumnsId: {},
       upperDropPlaceholderOptions: {
         className: "cards-drop-preview",
         animationDuration: "150",
@@ -153,7 +175,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentBoard", "boardColumns", "me"]),
+    ...mapGetters(["currentBoard", "boardColumns", "me", "currentBoardCards"]),
 
     sortedColumns() {
       return _.sortBy(this.columns, "position");
@@ -166,11 +188,29 @@ export default {
       "updateColumnTitle",
       "upsertColumn",
       "normalizeColumnOrder",
-      "deleteColumn"
+      "deleteColumn",
+      "upsertCard",
+      "normalizeCardOrder"
     ]),
-
+    setEditedCard(columnId) {
+      this.isNewCardEditingColumnId = columnId;
+    },
     isTitleEdited(columnId) {
       return this.editedTitleColumnId === columnId;
+    },
+    sortedByPosition(cards) {
+      return sortBy(cards, "position");
+    },
+    async handleCreateCard({ title, columnId }) {
+      const cardInput = {
+        title,
+        columnId,
+        boardId: this.currentBoard._id,
+        position: this.lastPosition(this.cardsByColumnsId[columnId])
+      };
+      console.log(cardInput);
+      await this.upsertCard({ cardInput });
+      this.isNewCardEditingColumnId = null;
     },
     async handleTitleChange(newTitle, columnId) {
       try {
@@ -199,17 +239,16 @@ export default {
       await this.updateBoard({ boardId: this.currentBoard._id, boardInput });
       this.isBoardNameEdited = !this.isBoardNameEdited;
     },
-    lastPosition() {
-      return !this.boardColumns.length
+    lastPosition(collection) {
+      return !collection || !collection.length
         ? this.MAGIC_NUMBER
-        : this.boardColumns[this.boardColumns.length - 1].position +
-            this.MAGIC_NUMBER;
+        : collection[collection.length - 1].position + this.MAGIC_NUMBER;
     },
     async handleCreateColumn() {
       const columnInput = {
         boardId: this.currentBoard._id,
         title: this.newColumnTitle,
-        position: this.lastPosition(),
+        position: this.lastPosition(this.boardColumns),
         createdDate: new Date()
       };
       await this.upsertColumn({ columnInput });
@@ -224,23 +263,21 @@ export default {
       //console.log("drag start", event);
     },
 
-    getNewColumnPosition(to, from) {
+    getNewPosition(to, from, collection) {
       let newColumnPosition;
       if (to === 0) {
-        newColumnPosition = Math.round(this.sortedColumns[0].position / 2);
-      } else if (to === this.sortedColumns.length - 1) {
-        newColumnPosition = this.lastPosition();
+        newColumnPosition = Math.round(collection[0].position / 2);
+      } else if (to === collection.length - 1) {
+        newColumnPosition = this.lastPosition(this.boardColumns);
       } else if (to < from) {
-        const diff =
-          this.sortedColumns[to].position - this.sortedColumns[to - 1].position;
+        const diff = collection[to].position - collection[to - 1].position;
         newColumnPosition = newColumnPosition = Math.round(
-          this.sortedColumns[to - 1].position + diff / 2
+          collection[to - 1].position + diff / 2
         );
       } else {
-        const diff =
-          this.sortedColumns[to + 1].position - this.sortedColumns[to].position;
+        const diff = collection[to + 1].position - collection[to].position;
         newColumnPosition = newColumnPosition = Math.round(
-          this.sortedColumns[to].position + diff / 2
+          collection[to].position + diff / 2
         );
       }
 
@@ -252,7 +289,11 @@ export default {
       const { removedIndex, addedIndex, ...args } = dropResult;
       const from = removedIndex - 1;
       const to = addedIndex - 1;
-      const newColumnPosition = this.getNewColumnPosition(to, from);
+      const newColumnPosition = this.getNewPosition(
+        to,
+        from,
+        this.sortedColumns
+      );
       const boardId = this.currentBoard._id;
       //eslint-disable-next-line
       const { _id, title, position, ...columnFields } = this.sortedColumns[
@@ -285,10 +326,10 @@ export default {
         this.moveCardInsideSameColumn({ payload, removedIndex, addedIndex });
       }
       if (removedIndex !== null && addedIndex === null) {
-        this.removeCardFromColumn({ removedIndex, columnId });
+        //this.removeCardFromColumn({ removedIndex, columnId });
       }
       if (removedIndex === null && addedIndex !== null) {
-        this.addCardToColumn({ payload, addedIndex, columnId });
+        //this.addCardToColumn({ payload, addedIndex, columnId });
       }
     },
 
@@ -299,27 +340,47 @@ export default {
     getCardPayload(columnId) {
       return index => {
         return {
-          item: this.boardColumns[index],
+          item: this.sortedByPosition(this.cardsByColumnsId[columnId])[index],
           origin: columnId
         };
       };
     },
 
-    moveCardInsideSameColumn({ payload, removedIndex, addedIndex }) {
-      const column = this.boardColumns.find(col => col.id === payload.origin);
-      const movedItem = column.entriesOrder[removedIndex];
-      const pulledOrder = _.pull(
-        column.entriesOrder,
-        column.entriesOrder[removedIndex]
+    async moveCardInsideSameColumn({ payload, removedIndex, addedIndex }) {
+      const columnCards = this.sortedByPosition(
+        this.cardsByColumnsId[payload.origin]
       );
+      let newPosition;
+      if (addedIndex === 0) {
+        newPosition = Math.round(columnCards[0].position / 2);
+        console.log(newPosition);
+      } else if (addedIndex === columnCards.length - 1) {
+        newPosition = this.lastPosition(columnCards);
+      } else {
+        newPosition = this.getNewPosition(
+          addedIndex,
+          removedIndex,
+          columnCards
+        );
+      }
+      const { _id, title } = payload.item;
 
-      const newOrder = [
-        ...pulledOrder.slice(0, addedIndex),
-        movedItem,
-        ...pulledOrder.slice(addedIndex)
-      ];
-
-      column.entriesOrder = newOrder;
+      const cardInput = {
+        columnId: payload.origin,
+        _id,
+        title,
+        position: newPosition,
+        boardId: this.currentBoard._id
+      };
+      console.log(cardInput);
+      this.$set(
+        this.cardsByColumnsId[cardInput.columnId],
+        this.cardsByColumnsId[cardInput.columnId].findIndex(
+          c => c._id === cardInput._id
+        ),
+        cardInput
+      );
+      await this.upsertCard({ cardInput });
     },
 
     removeCardFromColumn({ removedIndex, columnId }) {
@@ -362,10 +423,25 @@ export default {
     if (this.currentBoard.columns) {
       this.columns = this.currentBoard.columns;
     }
+    if (this.currentBoardCards && this.currentBoardCards.length) {
+      this.cardsByColumnsId = _.groupBy(
+        this.currentBoardCards,
+        card => card.columnId._id
+      );
+    }
   },
   async beforeDestroy() {
     const columnIds = this.sortedColumns.map(({ _id }) => _id);
     await this.normalizeColumnOrder({ columnIds });
+    const cardOrderInputs = Object.entries(this.cardsByColumnsId).flatMap(
+      ([columnId, cards]) =>
+        sortBy(cards, "position").map(({ _id }, index) => ({
+          position: (index + 1) * this.MAGIC_NUMBER,
+          _id,
+          columnId
+        }))
+    );
+    await this.normalizeCardOrder({ cardOrderInputs });
   }
 };
 </script>

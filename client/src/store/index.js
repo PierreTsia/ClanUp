@@ -5,6 +5,7 @@ import app from "./modules/app";
 import auth from "./modules/auth";
 import boards from "./modules/boards";
 import columns from "./modules/columns";
+import cards from "./modules/cards";
 
 Vue.use(Vuex);
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
     app,
     auth,
     boards,
-    columns
+    columns,
+    cards
   }
 });

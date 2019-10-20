@@ -37,9 +37,11 @@ type Column {
 type Card {
   _id: ID
   title: String!
-  board: Board!
-  author: User!
-  column: Column!
+  description: String
+  boardId: ID!
+  columnId: Column!
+  position: Int!
+  author: User
   createdDate: String
 }
 
@@ -69,6 +71,21 @@ input ColumnInput {
   createdDate: String
 }
 
+input CardInput {
+  _id: ID
+  title: String!
+  description: String
+  boardId: ID!
+  columnId: ID!
+  position: Int!
+  createdDate: String
+}
+
+input CardOrderInput {
+  _id: ID!
+  columnId: ID!
+  position: Int!
+}
 
 type Mutation {
   signupUser(userInput: UserInput): Token
@@ -80,6 +97,8 @@ type Mutation {
   updateColumnTitle(columnId: ID!, title: String!): Column
   normalizeColumnOrder(columnIds: [ID]!): Boolean
   deleteColumn(columnId: ID!): ID
+  upsertCard(cardInput: CardInput!): Card
+  normalizeCardOrder(cardOrderInputs: [CardOrderInput]!): Boolean
 }
 
 type Query {

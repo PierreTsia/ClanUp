@@ -5,26 +5,28 @@ const CardSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  board: {
+  description: {
+    type: String
+  },
+  boardId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Board",
     required: true
   },
-  index: {
-    type: Number,
-    required: true
-  },
-  author:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-  column: {
+  columnId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Column",
     required: true
   },
-
+  position: {
+    type: Number,
+    required: true
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
   createdDate: {
     type: Date,
     default: Date.now

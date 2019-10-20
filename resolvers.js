@@ -101,16 +101,36 @@ module.exports = {
       return updatedBoard;
     },
 
+    //COLUMNS
     normalizeColumnOrder: async (_, { columnIds }, { currentUser, Column }) => {
       if (!currentUser) {
         throw Error("Authentication required");
       }
       const MAGIC_NUMBER = 1000000;
+
       for (const [i, colId] of columnIds.entries()) {
-        const newPosition = i * MAGIC_NUMBER;
+        const newPosition = (i + 1) * MAGIC_NUMBER;
         await Column.findOneAndUpdate(
           { _id: colId },
           { position: newPosition },
+          { new: true }
+        );
+      }
+    },
+
+    normalizeCardOrder: async (
+      _,
+      { cardOrderInputs },
+      { Card, currentUser }
+    ) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+      for (const { _id, position } of cardOrderInputs) {
+        console.log(_id, position);
+        await Card.findOneAndUpdate(
+          { _id },
+          { position },
           { new: true }
         );
       }
@@ -218,6 +238,68 @@ module.exports = {
       if (deleted) {
         return columnId;
       }
+    },
+
+    //CARDS
+    upsertCard: async (
+      _,
+      { cardInput },
+      { currentUser, Board, Card, Column }
+    ) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+
+      const board = await Board.findById(cardInput.boardId);
+
+      if (!board) {
+        throw Error(`No board found with id ${cardInput.boardId}`);
+      }
+
+      if (!board.owner.equals(currentUser._id)) {
+        throw Error("Only owner can update a board");
+      }
+
+      const column = await Column.findById(cardInput.columnId);
+
+      if (!column) {
+        throw Error(`No column found with id ${cardInput.columnId}`);
+      }
+
+      if (cardInput._id) {
+        const cardToUpdate = await Card.findById(cardInput._id);
+        if (!cardToUpdate) {
+          throw Error(`No Column found with id ${cardInput._id}`);
+        }
+
+        const { _id, ...fields } = cardInput;
+        const updatedCard = await Card.findOneAndUpdate(
+          { _id },
+          { ...fields },
+          { new: true }
+        ).populate([
+          { path: "author", model: "User" },
+          { path: "columnId", label: "Column" }
+        ]);
+
+        return updatedCard;
+      } else {
+        const newCard = await new Card({
+          ...cardInput,
+          author: currentUser._id
+        }).save();
+
+        await Column.findOneAndUpdate(
+          { _id: cardInput.columnId },
+          { $addToSet: { cards: newCard._id } },
+          { new: true }
+        ).populate([
+          { path: "author", model: "User" },
+          { path: "columnId", model: "Column" }
+        ]);
+
+        return newCard;
+      }
     }
   },
   /*
@@ -258,7 +340,16 @@ module.exports = {
       try {
         const boards = await Board.find()
           .where({ owner: currentUser })
-          .populate([{ path: "columns", model: "Column" }])
+          .populate([
+            {
+              path: "columns",
+              model: "Column",
+              populate: {
+                path: "cards",
+                model: "Card"
+              }
+            }
+          ])
           .sort({ createdDate: -1 });
 
         return boards;
@@ -278,7 +369,8 @@ module.exports = {
         },
         {
           path: "columns",
-          model: "Column"
+          model: "Column",
+          populate: { path: "cards", model: "Card" }
         }
       ]);
       if (!board) {

@@ -10,6 +10,9 @@ export const UPSERT_COLUMN = gql`
       author {
         _id
       }
+      cards {
+        _id
+      }
     }
   }
 `;

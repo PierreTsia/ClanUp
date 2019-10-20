@@ -136,7 +136,8 @@ const getStore = () =>
     getters: {
       me: () => {},
       currentBoard: () => currentBoardMock,
-      boardColumns: () => mockColumns
+      boardColumns: () => mockColumns,
+      currentBoardCards: () => []
     }
   });
 

@@ -104,6 +104,6 @@ const getStore = () =>
     state: {},
     actions,
     getters: {
-      me: () => {}
+      me: () => {},
     }
   });
