@@ -127,7 +127,6 @@ module.exports = {
         throw Error("Authentication required");
       }
       for (const { _id, position } of cardOrderInputs) {
-        console.log(_id, position);
         await Card.findOneAndUpdate(
           { _id },
           { position },

@@ -29,7 +29,6 @@ export const actions = {
       });
       commit(types.SET_BOARDS_SUCCESS, data.getMyBoards);
     } catch ({ message }) {
-      console.warn(message);
       commit(types.GET_BOARDS_ERROR, message);
     }
   },

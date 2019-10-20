@@ -208,7 +208,6 @@ export default {
         boardId: this.currentBoard._id,
         position: this.lastPosition(this.cardsByColumnsId[columnId])
       };
-      console.log(cardInput);
       await this.upsertCard({ cardInput });
       this.isNewCardEditingColumnId = null;
     },
@@ -264,24 +263,20 @@ export default {
     },
 
     getNewPosition(to, from, collection) {
-      let newColumnPosition;
+      let newPosition;
       if (to === 0) {
-        newColumnPosition = Math.round(collection[0].position / 2);
+        newPosition = Math.round(collection[0].position / 2);
       } else if (to === collection.length - 1) {
-        newColumnPosition = this.lastPosition(this.boardColumns);
+        newPosition = this.lastPosition(collection);
       } else if (to < from) {
         const diff = collection[to].position - collection[to - 1].position;
-        newColumnPosition = newColumnPosition = Math.round(
-          collection[to - 1].position + diff / 2
-        );
+        newPosition = Math.round(collection[to - 1].position + diff / 2);
       } else {
         const diff = collection[to + 1].position - collection[to].position;
-        newColumnPosition = newColumnPosition = Math.round(
-          collection[to].position + diff / 2
-        );
+        newPosition = Math.round(collection[to].position + diff / 2);
       }
 
-      return newColumnPosition;
+      return newPosition;
     },
 
     async onColumnDrop(dropResult) {
@@ -326,10 +321,10 @@ export default {
         this.moveCardInsideSameColumn({ payload, removedIndex, addedIndex });
       }
       if (removedIndex !== null && addedIndex === null) {
-        //this.removeCardFromColumn({ removedIndex, columnId });
+        this.removeCardFromColumn({ removedIndex, columnId, payload });
       }
       if (removedIndex === null && addedIndex !== null) {
-        //this.addCardToColumn({ payload, addedIndex, columnId });
+        this.addCardToColumn({ payload, addedIndex, columnId });
       }
     },
 
@@ -353,7 +348,6 @@ export default {
       let newPosition;
       if (addedIndex === 0) {
         newPosition = Math.round(columnCards[0].position / 2);
-        console.log(newPosition);
       } else if (addedIndex === columnCards.length - 1) {
         newPosition = this.lastPosition(columnCards);
       } else {
@@ -372,7 +366,6 @@ export default {
         position: newPosition,
         boardId: this.currentBoard._id
       };
-      console.log(cardInput);
       this.$set(
         this.cardsByColumnsId[cardInput.columnId],
         this.cardsByColumnsId[cardInput.columnId].findIndex(
@@ -383,37 +376,55 @@ export default {
       await this.upsertCard({ cardInput });
     },
 
-    removeCardFromColumn({ removedIndex, columnId }) {
-      const columnIndex = this.boardColumns.findIndex(
-        col => col.id === columnId
-      );
-      const oldEntries = this.sortedEntries(columnId);
-      const newEntries = oldEntries.filter(
-        entry => oldEntries.indexOf(entry) !== removedIndex
-      );
-      this.$set(this.boardColumns, columnIndex, {
-        ...this.boardColumns[columnIndex],
-        entries: newEntries,
-        entriesOrder: newEntries.map(e => e.id)
-      });
+    removeCardFromColumn({ columnId, payload }) {
+      this.cardsByColumnsId[payload.origin] = this.cardsByColumnsId[
+        columnId
+      ].filter(c => c._id !== payload.item._id);
     },
-
-    addCardToColumn({ payload, addedIndex, columnId }) {
-      const columnIndex = this.boardColumns.findIndex(
-        col => col.id === columnId
+    getNewCardPosition(destinationIndex, collection) {
+      let newPosition;
+      if (destinationIndex === 0) {
+        newPosition = collection.length
+          ? Math.round(collection[0].position / 2)
+          : this.MAGIC_NUMBER;
+      } else if (destinationIndex === collection.length) {
+        newPosition = this.lastPosition(collection);
+      } else {
+        const before = collection[destinationIndex - 1].position;
+        const after = collection[destinationIndex].position;
+        newPosition = before + (after - before) / 2;
+      }
+      return newPosition;
+    },
+    insertNewCard(collection, addedIndex, newCard) {
+      return collection && collection.length
+        ? [
+            ...collection.slice(0, addedIndex),
+            newCard,
+            ...collection.slice(addedIndex)
+          ]
+        : [newCard];
+    },
+    async addCardToColumn({ payload, addedIndex, columnId }) {
+      const columnCards = this.sortedByPosition(
+        this.cardsByColumnsId[columnId]
       );
-      const oldEntries = this.sortedEntries(columnId);
-      const newEntries = [
-        ...oldEntries.slice(0, addedIndex),
-        payload.item,
-        ...oldEntries.slice(addedIndex, oldEntries.length)
-      ];
+      const { _id, title } = payload.item;
+      const newPosition = this.getNewCardPosition(addedIndex, columnCards);
+      const cardInput = {
+        columnId,
+        _id,
+        position: newPosition,
+        title,
+        boardId: this.currentBoard._id
+      };
+      this.cardsByColumnsId[columnId] = this.insertNewCard(
+        this.cardsByColumnsId[columnId],
+        addedIndex,
+        cardInput
+      );
 
-      this.$set(this.boardColumns, columnIndex, {
-        ...this.boardColumns[columnIndex],
-        entries: newEntries,
-        entriesOrder: newEntries.map(e => e.id)
-      });
+      await this.upsertCard({ cardInput });
     }
   },
   async created() {
