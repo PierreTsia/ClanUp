@@ -20,7 +20,7 @@ mongoose
     useFindAndModify: false
   })
   .then(() => {
-    console.log("Database connected");
+    console.log("💾 💾 Database connected");
   })
   .catch(e => {
     console.log(e);
@@ -56,5 +56,5 @@ const server = new ApolloServer({
 });
 
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-  console.log(`🤖🤖🚀🚀Server listening on ${url}`);
+  console.log(`🤖🤖 Server listening on ${url}`);
 });

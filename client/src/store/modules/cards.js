@@ -1,6 +1,7 @@
 import * as types from "../mutation-types";
 import { defaultClient as apolloClient } from "../../main";
 import { NORMALIZE_CARDS_ORDER, UPSERT_CARD } from "../../../queries";
+import { flatMap } from "lodash";
 
 export const state = {
   currentBoardCards: [],
@@ -38,7 +39,10 @@ export const actions = {
 export const mutations = {
   [types.GET_BOARD_BY_ID_SUCCESS]: (state, board) => {
     const { columns } = board;
-    state.currentBoardCards = columns.flatMap(({ cards }) => cards);
+    console.log(columns);
+    if (columns && columns.length) {
+      state.currentBoardCards = flatMap(columns, col => col.cards);
+    }
   },
   [types.RESET_BOARD_CARDS]: state => (state.currentBoardCards = []),
   [types.UPSERT_CARD_SUCCESS]: (state, newCard) => {

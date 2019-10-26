@@ -118,7 +118,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { sortBy } from "lodash";
+import { sortBy, flatMap } from "lodash";
 import { Container, Draggable } from "vue-smooth-dnd";
 import ListHeader from "@/components/board/ListHeader";
 import ListFooter from "@/components/board/ListFooter";
@@ -129,6 +129,15 @@ export default {
   name: "BoardView.vue",
   components: { Container, Draggable, ListHeader, ListFooter },
   watch: {
+    boardId: {
+      immediate: true,
+      async handler(newBoardId, oldBoardId) {
+        if (!oldBoardId && newBoardId) {
+          console.log(newBoardId);
+          await this.getBoardById(newBoardId);
+        }
+      }
+    },
     boardColumns: {
       handler(newColumns, oldColumns) {
         if (oldColumns && newColumns.length !== oldColumns.length) {
@@ -148,6 +157,7 @@ export default {
   },
   data() {
     return {
+      boardId: null,
       items: [
         { id: "edit", title: "Edit list title", icon: "pencil" },
         { id: "delete", title: "Delete list", icon: "delete" }
@@ -427,8 +437,9 @@ export default {
       await this.upsertCard({ cardInput });
     }
   },
-  async created() {
+  async mounted() {
     const { id } = this.$route.params;
+    this.boardId = id;
     await this.getBoardById(id);
     this.newBoardName = this.currentBoard.boardname;
     if (this.currentBoard.columns) {
@@ -442,9 +453,11 @@ export default {
     }
   },
   async beforeDestroy() {
+    console.log("hello");
     const columnIds = this.sortedColumns.map(({ _id }) => _id);
     await this.normalizeColumnOrder({ columnIds });
-    const cardOrderInputs = Object.entries(this.cardsByColumnsId).flatMap(
+    const cardOrderInputs = flatMap(
+      Object.entries(this.cardsByColumnsId),
       ([columnId, cards]) =>
         sortBy(cards, "position").map(({ _id }, index) => ({
           position: (index + 1) * this.MAGIC_NUMBER,

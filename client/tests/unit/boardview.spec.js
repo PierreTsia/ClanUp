@@ -113,11 +113,7 @@ describe("BoardView.vue", () => {
       }
     });
   });
-  /* it("shoud allow user to update column title", async () => {
-    jest.spyOn(actions, "updateColumnTitle");
-    wrapper
 
-  })*/
 });
 
 const actions = {

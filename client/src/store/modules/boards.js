@@ -83,6 +83,7 @@ export const mutations = {
   [types.DELETE_BOARD_SUCCES]: (state, boardId) =>
     (state.boards = state.boards.filter(({ _id }) => _id !== boardId)),
   [types.GET_BOARD_BY_ID_SUCCESS]: (state, board) => {
+    console.log()
     const { columns } = board;
     state.currentBoardColumns = columns;
     state.currentBoard = board;
