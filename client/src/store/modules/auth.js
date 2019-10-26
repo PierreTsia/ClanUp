@@ -21,12 +21,13 @@ export const actions = {
   getCurrentUser: async ({ commit }) => {
     try {
       const { data } = await apolloClient.query({ query: GET_CURRENT_USER });
+      console.log("data getcurrent user", data);
       commit(types.SET_CURRENT_USER, data.getCurrentUser);
     } catch (e) {
       //eslint-disable-next-line
       console.warn(e);
-      const { message, name } = e;
-      commit(types.SET_AUTH_ERROR, { message, name });
+      /* const { message, name } = e;
+      commit(types.SET_AUTH_ERROR, { message, name });*/
     }
   },
   signup: async ({ commit }, { userInput }) => {
@@ -56,12 +57,12 @@ export const actions = {
       const { token, user } = data.signinUser;
       localStorage.setItem("token", token);
       commit(types.SET_LOGIN_SUCCESS, user);
-      await router.push("/");
+      await router.go("/");
     } catch (e) {
       //eslint-disable-next-line
       console.warn(e);
-      const { message, name } = e;
-      commit(types.SET_AUTH_ERROR, { message, name });
+      /* const { message, name } = e;
+      commit(types.SET_AUTH_ERROR, { message, name });*/
     }
   },
   logout: async ({ commit }) => {
@@ -69,7 +70,7 @@ export const actions = {
     commit(types.SET_CURRENT_USER, null);
     await apolloClient.resetStore();
     commit(types.SET_LOG_OUT_SUCCESS);
-    router.go("/login");
+    router.push("/login");
   },
   verifyUsername: async (_, username) => {
     try {
