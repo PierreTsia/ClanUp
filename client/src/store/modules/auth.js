@@ -18,9 +18,10 @@ const getters = {
   me: state => state.currentUser
 };
 export const actions = {
-  getCurrentUser: async ({ commit }) => {
+  getCurrentUsergetCurrentUser: async ({ commit }) => {
     try {
       const { data } = await apolloClient.query({ query: GET_CURRENT_USER });
+      console.log("data", data);
       commit(types.SET_CURRENT_USER, data.getCurrentUser);
     } catch (e) {
       //eslint-disable-next-line
@@ -53,10 +54,10 @@ export const actions = {
         mutation: SIGNIN_USER,
         variables: payload
       });
-      const { token } = data.signinUser;
+      const { token, user } = data.signinUser;
       localStorage.setItem("token", token);
-      commit(types.SET_LOGIN_SUCCESS);
-      await router.go("/");
+      commit(types.SET_LOGIN_SUCCESS, user);
+      await router.push("/");
     } catch (e) {
       //eslint-disable-next-line
       console.warn(e);
@@ -88,7 +89,7 @@ export const mutations = {
   [types.SET_AUTH_ERROR]: (state, error) => (state.error = error),
   [types.SET_CURRENT_USER]: (state, user) => (state.currentUser = user),
   [types.SET_LOG_OUT_SUCCESS]: state => (state.currentUser = null),
-  [types.SET_LOGIN_SUCCESS]: state => (state.error = null),
+  [types.SET_LOGIN_SUCCESS]: (state, user) => (state.currentUser = user),
   [types.SET_AUTH_ERROR]: (state, error) => (state.error = error),
   [types.CLEAR_ERRORS]: state => (state.error = null)
 };

@@ -1,15 +1,10 @@
 require("dotenv").config({ path: "variables.env" });
-const fs = require("fs");
-const path = require("path");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const Board = require("./models/Board");
 const Column = require("./models/Column");
 const Card = require("./models/Card");
-
-const filePath = path.join(__dirname, "typeDefs.graphql");
-const typeDefs = fs.readFileSync(filePath, "utf-8");
-const resolvers = require("./resolvers");
+const schema = require("./schema/schema");
 const { ApolloServer, gql, AuthenticationError } = require("apollo-server");
 const mongoose = require("mongoose");
 
@@ -40,8 +35,7 @@ const getUser = async token => {
 };
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  schema,
   formatError: error => ({
     name: error.name,
     message: error.message.replace("Context creation failed:", "")
@@ -54,7 +48,6 @@ const server = new ApolloServer({
     Column
   })
 });
-
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
   console.log(`🤖🤖 Server listening on ${url}`);
 });

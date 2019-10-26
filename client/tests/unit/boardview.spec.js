@@ -113,7 +113,6 @@ describe("BoardView.vue", () => {
       }
     });
   });
-
 });
 
 const actions = {
