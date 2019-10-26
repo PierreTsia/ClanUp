@@ -1,15 +1,11 @@
 <template>
   <v-app id="inspire">
-    <CreateBoardModal
-      :dialog="isActiveModal('create-board')"
+    <component
+      :is="activeModalName"
+      :dialog="isActiveModal(this.activeModalName)"
       :modalProps="modalProps"
       @onClickOutside="closeModal()"
-    />
-    <ConfirmModal
-      :dialog="isActiveModal('confirm-modal')"
-      :modalProps="modalProps"
-      @onClickOutside="closeModal()"
-    />
+    ></component>
     <NavigationDrawer :drawer="drawer" @onClickOutside="handleInputChange" />
     <Navbar @drawer="drawer = !drawer" />
     <v-content>

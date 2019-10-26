@@ -2,7 +2,7 @@
   <v-dialog
     content-class="confirm-modal"
     v-model="isShown"
-    max-width="300"
+    max-width="400"
     @click:outside="handleClickOutside"
   >
     <v-card>
@@ -75,22 +75,6 @@ export default {
 </script>
 
 <style lang="stylus">
-.modal
-    .pill
-        display block
-        width 40px
-        height 40px
-        border-radius 25%
-        cursor pointer
-        margin-left calc(50% - 20px)
-    .background
-      position relative
-      .form
-        position absolute
-        width 80%
-        top 10px
-        left 10%
-        .v-text-field__slot
-          input
-            font-weight bolder
+.confirm-modal
+  max-width 899px
 </style>

@@ -5,7 +5,7 @@ const Board = require("./models/Board");
 const Column = require("./models/Column");
 const Card = require("./models/Card");
 const schema = require("./schema/schema");
-const { ApolloServer, gql, AuthenticationError } = require("apollo-server");
+const { ApolloServer, AuthenticationError } = require("apollo-server");
 const mongoose = require("mongoose");
 
 mongoose

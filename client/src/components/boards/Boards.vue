@@ -73,7 +73,7 @@ export default {
     ]),
     handleCreateNewBoardClick() {
       this.openModal({
-        name: "create-board",
+        name: "create-board-modal",
         props: {
           onConfirmClick: async boardinput => {
             await this.createBoard(boardinput);

@@ -56,6 +56,7 @@
               </v-card-text>
             </v-card>
           </v-flex>
+
           <template v-if="boardColumns.length">
             <Draggable v-for="column in sortedColumns" :key="column._id">
               <div class="columnContainer mx-2 px-1">
@@ -90,6 +91,7 @@
                       cardsByColumnsId[column._id]
                     )"
                     :key="card._id"
+                    @click.native="handleCardClick(card)"
                   >
                     <v-card light class="card-container mb-2">
                       <h4 class="pa-2">{{ card.title }}</h4>
@@ -200,7 +202,8 @@ export default {
       "normalizeColumnOrder",
       "deleteColumn",
       "upsertCard",
-      "normalizeCardOrder"
+      "normalizeCardOrder",
+      "openModal"
     ]),
     setEditedCard(columnId) {
       this.isNewCardEditingColumnId = columnId;
@@ -247,6 +250,21 @@ export default {
       const boardInput = { boardname: this.newBoardName, owner: this.me._id };
       await this.updateBoard({ boardId: this.currentBoard._id, boardInput });
       this.isBoardNameEdited = !this.isBoardNameEdited;
+    },
+    handleCardClick(card) {
+      console.log(card);
+      this.openModal({
+        name: "create-board-modal",
+        props: {
+          onConfirmClick: async boardinput => {
+            await this.createBoard(boardinput);
+            this.closeModal();
+          },
+          onCancelClick: () => {
+            this.closeModal();
+          }
+        }
+      });
     },
     lastPosition(collection) {
       return !collection || !collection.length
@@ -453,7 +471,6 @@ export default {
     }
   },
   async beforeDestroy() {
-    console.log("hello");
     const columnIds = this.sortedColumns.map(({ _id }) => _id);
     await this.normalizeColumnOrder({ columnIds });
     const cardOrderInputs = flatMap(
@@ -481,7 +498,7 @@ export default {
       min-width 100%
       display flex
       overflow-x auto
-      min-height 60vh
+      min-height 85vh
     .columnContainer
       border-radius 5px
       background-color #EBECF0
@@ -495,5 +512,9 @@ export default {
         .v-icon
           cursor pointer
       .card-container
-          cursor grab
+          cursor pointer
+.card-ghost
+  cursor grabbing !important
+  opacity 0.9
+  transform rotate(7deg)
 </style>

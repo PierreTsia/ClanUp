@@ -43,7 +43,7 @@ describe("Boards.vue", () => {
     expect(actions.openModal).toHaveBeenCalledWith(
       expect.any(Object),
       {
-        name: "create-board",
+        name: "create-board-modal",
         props: expect.any(Object)
       },
       undefined
