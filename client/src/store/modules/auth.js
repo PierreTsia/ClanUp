@@ -18,10 +18,9 @@ const getters = {
   me: state => state.currentUser
 };
 export const actions = {
-  getCurrentUsergetCurrentUser: async ({ commit }) => {
+  getCurrentUser: async ({ commit }) => {
     try {
       const { data } = await apolloClient.query({ query: GET_CURRENT_USER });
-      console.log("data", data);
       commit(types.SET_CURRENT_USER, data.getCurrentUser);
     } catch (e) {
       //eslint-disable-next-line
