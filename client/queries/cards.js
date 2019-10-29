@@ -4,6 +4,7 @@ export const UPSERT_CARD = gql`
     upsertCard(cardInput: $cardInput) {
       _id
       title
+      description
       position
       author {
         _id

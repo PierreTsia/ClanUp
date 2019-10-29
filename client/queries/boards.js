@@ -14,6 +14,7 @@ export const GET_MYBOARDS = gql`
         cards {
           _id
           title
+          description
           position
         }
       }
@@ -41,6 +42,7 @@ export const GET_BOARD_BY_ID = gql`
         cards {
           _id
           title
+          description
           position
           columnId {
             _id
@@ -89,4 +91,3 @@ export const DELETE_BOARD = gql`
     deleteBoard(boardId: $boardId)
   }
 `;
-

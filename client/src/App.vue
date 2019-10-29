@@ -21,6 +21,7 @@ import Navbar from "@/components/navbar/Navbar.vue";
 import NavigationDrawer from "@/components/base/NavigationDrawer";
 import CreateBoardModal from "@/components/base/CreateBoardModal";
 import ConfirmModal from "@/components/base/ConfirmModal";
+import EditCardModal from "@/components/base/EditCardModal";
 
 import { mapGetters, mapActions } from "vuex";
 export default {
@@ -31,6 +32,7 @@ export default {
     Navbar,
     CreateBoardModal,
     ConfirmModal,
+    EditCardModal,
     NavigationDrawer
   },
   data: () => ({

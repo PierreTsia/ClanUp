@@ -52,7 +52,11 @@ export const mutations = {
       const index = state.currentBoardCards.findIndex(
         c => c._id === newCard._id
       );
-      state.currentBoardCards[index] = newCard;
+      state.currentBoardCards = [
+        ...state.currentBoardCards.slice(0, index),
+        newCard,
+        ...state.currentBoardCards.slice(index + 1)
+      ];
     }
   }
 };

@@ -203,7 +203,8 @@ export default {
       "deleteColumn",
       "upsertCard",
       "normalizeCardOrder",
-      "openModal"
+      "openModal",
+      "closeModal"
     ]),
     setEditedCard(columnId) {
       this.isNewCardEditingColumnId = columnId;
@@ -253,12 +254,16 @@ export default {
     },
     handleCardClick(card) {
       console.log(card);
+      const cardColumn = this.boardColumns.find(
+        c => c._id === card.columnId._id
+      );
       this.openModal({
-        name: "create-board-modal",
+        name: "edit-card-modal",
         props: {
-          onConfirmClick: async boardinput => {
-            await this.createBoard(boardinput);
-            this.closeModal();
+          card: { ...card, column: cardColumn },
+          onConfirmClick: async cardInput => {
+            console.log(cardInput);
+            // this.closeModal();
           },
           onCancelClick: () => {
             this.closeModal();

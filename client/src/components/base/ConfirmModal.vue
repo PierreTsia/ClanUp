@@ -73,8 +73,3 @@ export default {
   }
 };
 </script>
-
-<style lang="stylus">
-.confirm-modal
-  max-width 899px
-</style>
