@@ -64,4 +64,3 @@ describe("EditCardModal.vue", () => {
     expect(textField.exists()).toEqual(true);
   });
 });
-

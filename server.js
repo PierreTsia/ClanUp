@@ -4,6 +4,7 @@ const User = require("./models/User");
 const Board = require("./models/Board");
 const Column = require("./models/Column");
 const Card = require("./models/Card");
+const Tag = require("./models/Tag");
 const schema = require("./schema/schema");
 const { ApolloServer, AuthenticationError } = require("apollo-server");
 const mongoose = require("mongoose");
@@ -45,7 +46,8 @@ const server = new ApolloServer({
     User,
     Board,
     Card,
-    Column
+    Column,
+    Tag
   })
 });
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {

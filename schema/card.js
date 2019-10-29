@@ -6,16 +6,22 @@ const card = gql`
     title: String!
     description: String
     boardId: ID!
+    tags: [Tag]
     columnId: Column!
     position: Int!
     author: User
     createdDate: String
   }
+  input TagId {
+    _id: ID!
+  }
+
   input CardInput {
     _id: ID
     title: String!
     description: String
     boardId: ID!
+    tags: [TagId]
     columnId: ID!
     position: Int!
     createdDate: String

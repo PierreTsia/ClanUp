@@ -18,6 +18,10 @@ const CardSchema = new mongoose.Schema({
     ref: "Column",
     required: true
   },
+  tags: {
+    type: [mongoose.Schema.Types.ObjectID],
+    ref: "Tag"
+  },
   position: {
     type: Number,
     required: true

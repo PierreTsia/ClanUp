@@ -41,18 +41,18 @@ const boardResolvers = {
       }
       try {
         const boards = await Board.find()
-            .where({ owner: currentUser })
-            .populate([
-              {
-                path: "columns",
-                model: "Column",
-                populate: {
-                  path: "cards",
-                  model: "Card"
-                }
+          .where({ owner: currentUser })
+          .populate([
+            {
+              path: "columns",
+              model: "Column",
+              populate: {
+                path: "cards",
+                model: "Card"
               }
-            ])
-            .sort({ createdDate: -1 });
+            }
+          ])
+          .sort({ createdDate: -1 });
 
         return boards;
       } catch (e) {
@@ -72,7 +72,14 @@ const boardResolvers = {
         {
           path: "columns",
           model: "Column",
-          populate: { path: "cards", model: "Card" }
+          populate: {
+            path: "cards",
+            model: "Card",
+            populate: {
+              path: "tags",
+              model: "Tag"
+            }
+          }
         }
       ]);
       if (!board) {
@@ -147,9 +154,7 @@ const boardResolvers = {
 
       return updatedBoard;
     }
-  },
-
-
+  }
 };
 
 module.exports = { board, boardResolvers };

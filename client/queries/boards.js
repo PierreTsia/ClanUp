@@ -42,6 +42,11 @@ export const GET_BOARD_BY_ID = gql`
         cards {
           _id
           title
+          tags {
+            _id
+            label
+            color
+          }
           description
           position
           columnId {
