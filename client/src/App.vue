@@ -76,6 +76,7 @@ export default {
 };
 </script>
 <style lang="stylus">
+ *{ text-transform: none !important; }
 .drawer
   .v-list-item__content
     display flex

@@ -8,32 +8,39 @@
     <v-card
       color="grey"
       min-height="800"
-      class="editCardModal__card accent--text"
+      class="editCardModal__card accent--text pa-lg-6"
     >
-      <section class="editCardModal__card__header">
-        <div class="editCardModal__card__header__text pr-8">
-          <h3
-            class="cardTitle"
-            v-if="!isCardTitleEdited"
-            @click="isCardTitleEdited = !isCardTitleEdited"
-          >
-            {{ newCardTitle }}
-          </h3>
-          <v-text-field
-            class="textField"
-            v-else
-            dense
-            max-width="400px"
-            v-model="newCardTitle"
-            autofocus
-            light
-            @blur="handleEditCardTitle"
-          ></v-text-field>
+      <v-layout class="editCardModal__card__header pt-4">
+        <v-flex xs12 class="editCardModal__card__header__text px-3 mb-4">
+          <span class="d-flex align-center">
+            <v-icon class="title mr-2" color="accent" size="24"
+              >mdi-subtitles</v-icon
+            >
 
-          <span class="accent--text subtitle-2"
-            >From list {{ columnTitle }}</span
+            <h3
+              class="cardTitle"
+              v-if="!isCardTitleEdited"
+              @click="isCardTitleEdited = !isCardTitleEdited"
+            >
+              {{ newCardTitle }}
+            </h3>
+            <v-text-field
+              class="textField"
+              v-else
+              dense
+              hide-details
+              max-width="400px"
+              v-model="newCardTitle"
+              autofocus
+              light
+              @blur="handleEditCardTitle"
+            ></v-text-field>
+          </span>
+
+          <small class="d-block flex-grow-1 accent--text  pl-8 columnName"
+            >From list {{ columnTitle }}</small
           >
-        </div>
+        </v-flex>
 
         <v-icon
           @click="modalProps.onCancelClick"
@@ -42,17 +49,18 @@
           size="24"
           >mdi-close</v-icon
         >
-        <v-icon class="title" color="accent" size="18">mdi-subtitles</v-icon>
-      </section>
-      <section class="editCardModal__card__content">
-        <div class="editCardModal__card__content__cardBody">
-          <div class="cardDescription">
-            <v-icon class="description" color="accent" size="18"
-              >mdi-text-subject</v-icon
-            >
-            <h3 class="sectionHeader">
-              Description
-            </h3>
+      </v-layout>
+      <v-layout class="editCardModal__card__content">
+        <v-flex class="editCardModal__card__content__cardBody px-3">
+          <div class="cardContentBlock">
+            <v-flex class="d-flex justify-start align-start">
+              <v-icon class="description mr-2 pt-1" color="accent" size="24"
+                >mdi-text-subject</v-icon
+              >
+              <h3 class="sectionHeader">
+                Description
+              </h3>
+            </v-flex>
             <template v-if="isDescriptionEdited">
               <v-textarea
                 v-model="newCardDescription"
@@ -66,7 +74,7 @@
                 no-resize
                 name="input-7-4"
                 label="Enter card description..."
-                class="mb-2"
+                class="mb-2 textArea"
               ></v-textarea>
               <div class="description_actions">
                 <v-btn class="success mx-auto" small color="white">
@@ -89,23 +97,114 @@
                 @click="isDescriptionEdited = !isDescriptionEdited"
                 >Add a detailed description...</span
               >
-              <span
+              <small
                 v-else
-                class="cardDescription--value py-3"
+                class="cardDescription--value d-block pl-1"
                 @click="isDescriptionEdited = !isDescriptionEdited"
-                >{{ newCardDescription }}</span
+                >{{ newCardDescription }}</small
               >
             </template>
           </div>
-        </div>
-        <div class="editCardModal__card__content__cardMenu">menu</div>
-      </section>
+          <div class="cardContentBlock">
+            <v-flex class="d-flex justify-start align-start mb-2">
+              <v-icon class="activities mr-3 pt-1" color="accent" size="24"
+                >mdi-format-list-bulleted</v-icon
+              >
+              <h3 class="sectionHeader">
+                Activities
+              </h3>
+            </v-flex>
+            <v-flex xs12 class="d-flex align-center comment pl-sm-5">
+              <v-avatar color="indigo" size="36" class="avatar">
+                <img :src="me.avatar" alt="avatar" />
+              </v-avatar>
+              <v-textarea
+                v-model="newComment"
+                :rows="isCommentFocus ? 5 : 2"
+                dense
+                solo
+                no-resize
+                hide-details
+                autofocus
+                light
+                class="ml-5 pa-0 "
+                label="Enter comment..."
+                @focus="isCommentFocus = true"
+                @blur="event => handleBlur(event)"
+              ></v-textarea>
+              <v-flex v-if="isCommentFocus" class="comment_actions d-flex pa-1">
+                <v-btn
+                  tile
+                  small
+                  height="25px"
+                  class="success commentActionBtn"
+                  @click.stop="isCommentFocus = true"
+                  >confirm</v-btn
+                >
+                <v-btn icon class="commentActionBtn">
+                  <v-icon color="accent" size="16">mdi-paperclip</v-icon>
+                </v-btn>
+                <v-btn icon class="commentActionBtn">
+                  <v-icon color="accent" size="16">mdi-mail-ru</v-icon>
+                </v-btn>
+                <v-btn icon class="commentActionBtn">
+                  <v-icon color="accent" size="16">mdi-emoticon-outline</v-icon>
+                </v-btn>
+              </v-flex>
+            </v-flex>
+          </div>
+        </v-flex>
+        <v-flex class="editCardModal__card__content__cardMenu">
+          <span class="text-start cardMenu_header px-3">
+            Add to the card
+          </span>
+          <section class="cardMenu_items px-3">
+            <v-menu
+              :ref="`menuRef_${item.id}`"
+              v-for="item in menuItems"
+              :key="item.id"
+              transition="slide-y-transition"
+              offset-y
+              :close-on-click="true"
+              :close-on-content-click="false"
+              nudge-bottom="5"
+              bottom
+            >
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  text
+                  class="darkgrey text-left justify-start px-1 mb-2"
+                  color="accent"
+                  dark
+                  @click="handleMenuClick(item.id)"
+                  v-on="on"
+                >
+                  <v-icon color="accent" size="14" class="mr-2">{{
+                    item.icon
+                  }}</v-icon>
+                  {{ item.label }}
+                </v-btn>
+              </template>
+              <ContextualMenu :item="item" @onCloseClick="handleCloseClick">
+                <template slot="menuContent">
+                  <component :is="item.component" />
+                </template>
+              </ContextualMenu>
+            </v-menu>
+          </section>
+        </v-flex>
+      </v-layout>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import {
+  TagMenu,
+  DueDateMenu,
+  ContextualMenu
+} from "@/components/base/menus/index";
 export default {
   name: "EditCardModal",
   props: {
@@ -126,24 +225,81 @@ export default {
       }
     }
   },
-  components: {},
+  components: {
+    TagMenu,
+    DueDateMenu,
+    ContextualMenu
+  },
   data() {
     return {
+      menus: {
+        add_tag: false,
+        add_dueDate: false
+      },
+      items: [
+        { title: "Click Me" },
+        { title: "Click Me" },
+        { title: "Click Me" },
+        { title: "Click Me 2" }
+      ],
       isShown: false,
       isCardTitleEdited: false,
       isDescriptionEdited: false,
+      isCommentFocus: false,
       card: null,
       newCardTitle: "",
       columnTitle: "",
       newCardDescription: "",
-      tempCardDescription: ""
+      tempCardDescription: "",
+      newComment: "",
+      menuItems: [
+        {
+          id: "add_tag",
+          label: "add a tag",
+          icon: "mdi-tag-outline",
+          component: "TagMenu",
+          title: "Add a Tag"
+        },
+        {
+          id: "add_dueDate",
+          label: "due date",
+          icon: "mdi-clock-outline",
+          component: "DueDateMenu",
+          title: "Add a Due Date"
+        }
+      ]
     };
   },
   computed: {
-    ...mapGetters(["currentBoard"])
+    ...mapGetters(["currentBoard", "me", "allTags"])
   },
   methods: {
-    ...mapActions(["upsertCard"]),
+    ...mapActions(["upsertCard", "getAllTags"]),
+    async handleMenuClick(itemId) {
+      console.log(itemId);
+      switch (itemId) {
+        case "add_tag":
+          console.log("addtag");
+          await this.getAllTags();
+          break;
+        default:
+          return;
+      }
+    },
+    handleBlur(event) {
+      if (
+        !event.relatedTarget ||
+        !event.relatedTarget.classList.contains("commentActionBtn")
+      ) {
+        this.isCommentFocus = false;
+      }
+    },
+    handleCloseClick(itemId) {
+      const menu = this.$refs[`menuRef_${itemId}`];
+      if (menu && menu[0]) {
+        menu[0].isActive = false;
+      }
+    },
     async handleEditCardTitle() {
       if (this.newCardTitle.length && this.newCardTitle !== this.card.title) {
         const cardInput = {
@@ -174,12 +330,6 @@ export default {
         this.tempCardDescription = this.newCardDescription;
         this.isDescriptionEdited = !this.isDescriptionEdited;
       }
-
-      /* if (!this.newCardDescription.length) {
-        this.newCardDescription = this.tempCardDescription;
-      }
-
-      */
     },
     handleClickOutside() {
       this.$emit("onClickOutside");
@@ -208,57 +358,98 @@ export default {
 </script>
 
 <style lang="stylus">
+@media screen and (min-width:800px )
+  .editCardModal
+    .editCardModal__card
+      .editCardModal__card__content
+        flex-direction row !important
+        .editCardModal__card__content__cardBody
+          width 70%
+          .cardContentBlock
+            padding-right 20px
+          .textArea, .description_actions, .cardDescription--value, .noDescription
+            margin-left 30px
+          .avatar
+            display block
+
+
+
 .editCardModal
     .editCardModal__card
         cursor default !important
         display flex
         flex-direction column
         .editCardModal__card__header
-            height 100px
             position relative
+            max-height 80px
             display flex
             flex-direction column
             justify-content center
             .editCardModal__card__header__text
                 width 90%
-                margin-left auto
+                margin-right auto
                 h3
                   padding 0
                   font-size 1.5rem
             .v-icon
-              position absolute
               &.close
+                position absolute
                 right 5px
                 top 5px
                 cursor pointer
               &.title
-                left 45px
-                top 30px
+                left 5px
+                top 20px
         .editCardModal__card__content
             display flex
-            padding-left 80px
+            flex-direction column
             flex-grow 1
-            .editCardModal__card__content__cardBody, .editCardModal__card__content__cardMenu
+            .avatar
+              display none
             .editCardModal__card__content__cardMenu
-                width 250px
+                flex-grow 1
+                .cardMenu_header
+                  font-size 12px
+                  font-weight 500
+                  text-transform uppercase
+                .cardMenu_items
+                  display flex
+                  flex-direction column
+                  justify-content flex-start
+                  .cardMenu_items_item
+                    display block
+                    background-color #E2E4E9
+                    padding 5px
+                    font-size 0.9rem
+                    margin 5px 0
+                    border-radius 5px
+                    cursor pointer
+                    transition background-color .5 ease-in
+                    &:hover
+                      background-color #c6ccd3
             .editCardModal__card__content__cardBody
                 flex-grow 1
-                .cardDescription
+                .cardContentBlock
                     position relative
-                    padding-right 20px
+                    &:not(:first-child)
+                      margin-top 30px
                     .noDescription
                       padding 10px 10px 30px 10px
                       display block
                       background-color #E2E4E9
-                      width 100%
                       font-size 0.8rem
                       border-radius 5px
                       cursor pointer
+                    .cardDescription--value
+                      cursor pointer
                       &:hover
                         text-decoration underline
-                    .v-icon
-                        &.description
-                            position absolute
-                            left -35px
-                            top 5px
+                    .comment
+                      position relative
+                      .comment_actions
+                        position absolute
+                        bottom 5px
+                        left 85px
+                        height 30px
+                        width calc(100% - 85px)
 </style>

@@ -25,3 +25,5 @@ export const APP_DARK_MODE = "APP_DARK_MODE";
 export const APP_OPEN_MODAL = "APP_OPEN_MODAL";
 export const APP_CLOSE_MODAL = "APP_CLOSE_MODAL";
 export const APP_THEME_SWITCH = "APP_THEME_SWITCH";
+
+export const FETCH_TAGS_SUCCESS = "FETCH_TAGS_SUCCESS";

@@ -11,9 +11,16 @@ const card = gql`
     position: Int!
     author: User
     createdDate: String
+    comments: [Comment]
   }
   input TagId {
     _id: ID!
+  }
+
+  type Comment {
+    author: User!
+    message: String!
+    createdDate: String
   }
 
   input CardInput {

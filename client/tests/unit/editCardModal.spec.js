@@ -12,10 +12,18 @@ describe("EditCardModal.vue", () => {
   const modalProps = {
     card: { _id: "1", title: "test", column: { title: "column-test" } }
   };
+  const store = {
+    getters: {
+      currentBoard: () => {},
+      me: () => {},
+      allTags: () => []
+    }
+  };
 
   it("should render component", () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
+      store,
       propsData: {
         modalProps
       }
@@ -25,6 +33,7 @@ describe("EditCardModal.vue", () => {
   it("should display the card title ", () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
+      store,
       propsData: {
         modalProps
       }
@@ -38,11 +47,12 @@ describe("EditCardModal.vue", () => {
   it("should display the title of the card column", () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
+      store,
       propsData: {
         modalProps
       }
     });
-    const subtitle = wrapper.find(".subtitle-2");
+    const subtitle = wrapper.find(".columnName");
     expect(subtitle.exists()).toBe(true);
     expect(subtitle.text()).toEqual("From list column-test");
   });
@@ -50,6 +60,7 @@ describe("EditCardModal.vue", () => {
   it("should display a text input if title is clicked", async () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
+      store,
       propsData: {
         modalProps
       }

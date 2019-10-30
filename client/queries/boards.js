@@ -47,6 +47,11 @@ export const GET_BOARD_BY_ID = gql`
             label
             color
           }
+          comments {
+            author {
+              _id
+            }
+          }
           description
           position
           columnId {

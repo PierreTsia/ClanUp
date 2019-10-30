@@ -1,5 +1,21 @@
 const mongoose = require("mongoose");
 
+const Comment = new mongoose.Schema({
+  author: {
+    type: mongoose.Schema.Types.ObjectID,
+    ref: "User",
+    required: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  createdDate: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const CardSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -34,6 +50,9 @@ const CardSchema = new mongoose.Schema({
   createdDate: {
     type: Date,
     default: Date.now
+  },
+  comments: {
+    type: [Comment]
   }
 });
 
