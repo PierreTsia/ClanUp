@@ -52,7 +52,7 @@
               close
               @click:close="handleRemoveTagFromCard(tag._id)"
             >
-              {{ tag.label }}
+              {{ tag.label.trim().length ? tag.label : `&nbsp;` }}
             </v-chip>
           </div>
         </v-flex>
@@ -301,19 +301,30 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentBoard", "me", "allTags", "currentCard"])
+    ...mapGetters([
+      "currentBoard",
+      "me",
+      "allTags",
+      "currentCard",
+      "currentCardTagsIds"
+    ])
   },
   methods: {
     ...mapActions([
       "upsertCard",
-      "getAllTags",
+      "getBoardTags",
       "addTagToCard",
       "removeTagFromCard"
     ]),
     async handleTagClick(tag) {
-      if (tag._id) {
+      if (!this.currentCardTagsIds.includes(tag._id)) {
         const tagInput = { _id: tag._id, cardId: this.currentCard._id };
         await this.addTagToCard({ tagInput });
+      } else {
+        await this.removeTagFromCard({
+          tagId: tag._id,
+          cardId: this.currentCard._id
+        });
       }
     },
 
@@ -324,7 +335,7 @@ export default {
     async handleMenuClick(itemId) {
       switch (itemId) {
         case "add_tag":
-          await this.getAllTags();
+          await this.getBoardTags({ boardId: this.currentBoard._id });
           break;
         default:
           return;

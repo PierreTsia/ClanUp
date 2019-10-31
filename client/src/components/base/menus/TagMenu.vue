@@ -32,19 +32,19 @@ export default {
       value: true,
       cardTags: [],
       defaultTags: [
-        { label: "", color: "#F3D43D" },
+        /*  { label: "", color: "#F3D43D" },
         { label: "", color: "#FF9D38" },
         { label: "", color: "#4FBC5A" },
         { label: "", color: "#F3594C" },
         { label: "", color: "#C877DB" },
-        { label: "", color: "#0079BA" }
+        { label: "", color: "#0079BA" }*/
       ]
     };
   },
   computed: {
     ...mapGetters(["allTags", "currentCardTagsIds"]),
     displayTags() {
-      return [...this.allTags, ...this.defaultTags].slice(0, 6);
+      return [...this.allTags].slice(0, 6);
     }
   },
   methods: {}

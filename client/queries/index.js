@@ -21,7 +21,12 @@ import {
 } from "./columns";
 
 import { UPSERT_CARD, NORMALIZE_CARDS_ORDER, CARD_BY_ID } from "./cards";
-import { ALL_TAGS, ADD_TAG_TO_CARD, REMOVE_TAG_FROM_CARD } from "./tags";
+import {
+  ALL_TAGS,
+  BOARD_TAGS,
+  ADD_TAG_TO_CARD,
+  REMOVE_TAG_FROM_CARD
+} from "./tags";
 export {
   GET_CURRENT_USER,
   SIGNIN_USER,
@@ -39,6 +44,7 @@ export {
   UPSERT_CARD,
   NORMALIZE_CARDS_ORDER,
   ALL_TAGS,
+  BOARD_TAGS,
   ADD_TAG_TO_CARD,
   REMOVE_TAG_FROM_CARD,
   CARD_BY_ID

@@ -2,7 +2,7 @@ import * as types from "../mutation-types";
 import { defaultClient as apolloClient } from "../../main";
 import {
   ADD_TAG_TO_CARD,
-  ALL_TAGS,
+  BOARD_TAGS,
   REMOVE_TAG_FROM_CARD
 } from "../../../queries";
 
@@ -15,12 +15,14 @@ export const getters = {
 };
 
 export const actions = {
-  getAllTags: async ({ commit }) => {
+  getBoardTags: async ({ commit }, payload) => {
+    console.log("salut", payload);
     try {
       const { data } = await apolloClient.query({
-        query: ALL_TAGS
+        query: BOARD_TAGS,
+        variables: payload
       });
-      commit(types.FETCH_TAGS_SUCCESS, data.allTags);
+      commit(types.FETCH_TAGS_SUCCESS, data.boardTags);
     } catch (e) {
       console.warn(e);
     }

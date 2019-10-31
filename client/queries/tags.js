@@ -9,6 +9,16 @@ export const ALL_TAGS = gql`
   }
 `;
 
+export const BOARD_TAGS = gql`
+  query($boardId: ID!) {
+    boardTags(boardId: $boardId) {
+      _id
+      label
+      color
+    }
+  }
+`;
+
 export const ADD_TAG_TO_CARD = gql`
   mutation($tagInput: TagInput!) {
     addTagToCard(tagInput: $tagInput) {

@@ -5,9 +5,13 @@ const TagSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  color:{
+  color: {
     type: String
   },
+  board: {
+    type: mongoose.Schema.Types.ObjectID,
+    ref: "Board"
+  }
 });
 
 module.exports = mongoose.model("Tag", TagSchema);

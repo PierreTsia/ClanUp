@@ -31,7 +31,7 @@ export default {
   computed: {
     ...mapGetters(["currentCardTagsIds"]),
     isActive() {
-      return (
+      return !!(
         this.currentCardTagsIds &&
         this.currentCardTagsIds.length &&
         this.currentCardTagsIds.includes(this.tag._id)
