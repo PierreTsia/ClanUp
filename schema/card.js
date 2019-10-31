@@ -13,7 +13,8 @@ const card = gql`
     createdDate: String
     comments: [Comment]
   }
-  input TagId {
+  input TagInput {
+    cardId: ID!
     _id: ID!
   }
 
@@ -28,7 +29,6 @@ const card = gql`
     title: String!
     description: String
     boardId: ID!
-    tags: [TagId]
     columnId: ID!
     position: Int!
     createdDate: String
@@ -38,13 +38,34 @@ const card = gql`
     columnId: ID!
     position: Int!
   }
+
+  extend type Query {
+    cardById(cardId: ID!): Card
+  }
+
   extend type Mutation {
     upsertCard(cardInput: CardInput!): Card
     normalizeCardOrder(cardOrderInputs: [CardOrderInput]!): Boolean
+    addTagToCard(tagInput: TagInput!): Card
   }
 `;
 
 const cardResolvers = {
+  Query: {
+    cardById: async (_, { cardId }, { currentUser, Card }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+      const card = await Card.findById(cardId).populate([
+        { path: "columnId", model: "Column" },
+        { path: "tags", model: "Tag" }
+      ]);
+      if (!card) {
+        throw Error(`NO card found with id ${cardId}`);
+      }
+      return card;
+    }
+  },
   Mutation: {
     normalizeCardOrder: async (
       _,
@@ -57,6 +78,33 @@ const cardResolvers = {
       for (const { _id, position } of cardOrderInputs) {
         await Card.findOneAndUpdate({ _id }, { position }, { new: true });
       }
+    },
+
+    addTagToCard: async (_, { tagInput }, { currentUser, Card, Tag }) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+
+      const { cardId, _id } = tagInput;
+      const card = await Card.findById(cardId);
+      if (!card) {
+        throw Error(`No card found with id ${cardId}`);
+      }
+
+      if (!card.author.equals(currentUser._id)) {
+        throw Error("Only owner can update a card");
+      }
+
+      const savedCard = await Card.findOneAndUpdate(
+        { _id: cardId },
+        { $addToSet: { tags: { _id } } },
+        { new: true }
+      ).populate([
+        { path: "author", model: "User" },
+        { path: "tags", model: "Tag" }
+      ]);
+
+      return savedCard;
     },
     upsertCard: async (
       _,

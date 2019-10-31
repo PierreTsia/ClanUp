@@ -1,17 +1,40 @@
 import * as types from "../mutation-types";
 import { defaultClient as apolloClient } from "../../main";
-import { NORMALIZE_CARDS_ORDER, UPSERT_CARD } from "../../../queries";
+import {
+  CARD_BY_ID,
+  NORMALIZE_CARDS_ORDER,
+  UPSERT_CARD
+} from "../../../queries";
 import { flatMap } from "lodash";
 
 export const state = {
   currentBoardCards: [],
-  error: null
+  error: null,
+  currentCard: null
 };
 export const getters = {
-  currentBoardCards: state => state.currentBoardCards
+  currentBoardCards: state => state.currentBoardCards,
+  currentCard: state => state.currentCard,
+  currentCardTagsIds: state =>
+    state.currentCard && state.currentCard.tags
+      ? state.currentCard.tags.map(({ _id }) => _id)
+      : []
 };
 
 export const actions = {
+  getCardById: async ({ commit }, cardId) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: CARD_BY_ID,
+        variables: cardId
+      });
+      console.log(data);
+      commit(types.GET_CURRENT_CARD_SUCCESS, data.cardById);
+      return data.cardById;
+    } catch (e) {
+      console.warn(e);
+    }
+  },
   upsertCard: async ({ commit }, payload) => {
     try {
       const { data } = await apolloClient.mutate({
@@ -58,7 +81,10 @@ export const mutations = {
         ...state.currentBoardCards.slice(index + 1)
       ];
     }
-  }
+  },
+  [types.GET_CURRENT_CARD_SUCCESS]: (state, card) => (state.currentCard = card),
+  [types.ADD_TAG_TO_CARD_SUCCESS]: (state, tags) =>
+    console.log(tags)((state.currentCard = { ...state.currentCard, tags }))
 };
 
 export default {

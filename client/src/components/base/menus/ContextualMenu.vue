@@ -25,7 +25,7 @@
 
 <script>
 export default {
-  name: "TagMenu",
+  name: "ContextualMenu",
   props: {
     item: {
       type: Object,
@@ -46,4 +46,7 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style lang="stylus">
+.menu_add_tag
+    width 300px
+</style>

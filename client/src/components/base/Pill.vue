@@ -21,6 +21,10 @@ export default {
     coverImg: {
       type: String,
       default: ""
+    },
+    label: {
+      type: String,
+      default: ""
     }
   }
 };
@@ -28,6 +32,10 @@ export default {
 
 <style lang="stylus" scoped>
 .pill
+    min-height 25px
+    min-width 35px
+    border-radius 5px
+    display block
     background-position center
     background-size cover
 </style>

@@ -8,10 +8,10 @@
     <v-card
       color="grey"
       min-height="800"
-      class="editCardModal__card accent--text pa-lg-6"
+      class="editCardModal__card accent--text px-4"
     >
-      <v-layout class="editCardModal__card__header pt-4">
-        <v-flex xs12 class="editCardModal__card__header__text px-3 mb-4">
+      <div class="editCardModal__card__header pt-4">
+        <v-flex xs12 class="editCardModal__card__header__text mb-4">
           <span class="d-flex align-center">
             <v-icon class="title mr-2" color="accent" size="24"
               >mdi-subtitles</v-icon
@@ -41,17 +41,23 @@
             >From list {{ columnTitle }}</small
           >
         </v-flex>
+        <v-flex v-if="newCardTags && newCardTags.length">
+          <div class=" d-flex flex-grow-1 pl-8 mb-3 cardContentBlock">
+            <v-chip
+              class="tag white--text mr-2"
+              v-for="tag in newCardTags"
+              :key="tag._id"
+              :color="tag.color"
+              label
+              close
+              @click:close="handleRemoveTagFromCard(tag._id)"
+            >
+              {{ tag.label }}
+            </v-chip>
+          </div>
+        </v-flex>
 
-        <v-icon
-          @click="modalProps.onCancelClick"
-          color="accent"
-          class="close"
-          size="24"
-          >mdi-close</v-icon
-        >
-      </v-layout>
-      <v-layout class="editCardModal__card__content">
-        <v-flex class="editCardModal__card__content__cardBody px-3">
+        <v-flex>
           <div class="cardContentBlock">
             <v-flex class="d-flex justify-start align-start">
               <v-icon class="description mr-2 pt-1" color="accent" size="24"
@@ -74,9 +80,9 @@
                 no-resize
                 name="input-7-4"
                 label="Enter card description..."
-                class="mb-2 textArea"
+                class="mb-2 textArea pl-sm-8"
               ></v-textarea>
-              <div class="description_actions">
+              <div class="description_actions pl-sm-8">
                 <v-btn class="success mx-auto" small color="white">
                   <span
                     class="text-xs-left pr-1 white--text"
@@ -99,12 +105,24 @@
               >
               <small
                 v-else
-                class="cardDescription--value d-block pl-1"
+                class="cardDescription--value d-block pl-8 py-3"
                 @click="isDescriptionEdited = !isDescriptionEdited"
                 >{{ newCardDescription }}</small
               >
             </template>
           </div>
+        </v-flex>
+
+        <v-icon
+          @click="modalProps.onCancelClick"
+          color="accent"
+          class="close"
+          size="24"
+          >mdi-close</v-icon
+        >
+      </div>
+      <v-layout class="editCardModal__card__content mt-4">
+        <v-flex class="editCardModal__card__content__cardBody">
           <div class="cardContentBlock">
             <v-flex class="d-flex justify-start align-start mb-2">
               <v-icon class="activities mr-3 pt-1" color="accent" size="24"
@@ -160,6 +178,7 @@
           </span>
           <section class="cardMenu_items px-3">
             <v-menu
+              :content-class="`menu_${item.id}`"
               :ref="`menuRef_${item.id}`"
               v-for="item in menuItems"
               :key="item.id"
@@ -187,7 +206,10 @@
               </template>
               <ContextualMenu :item="item" @onCloseClick="handleCloseClick">
                 <template slot="menuContent">
-                  <component :is="item.component" />
+                  <component
+                    :is="item.component"
+                    @onTagSelect="handleTagClick"
+                  />
                 </template>
               </ContextualMenu>
             </v-menu>
@@ -218,6 +240,19 @@ export default {
     }
   },
   watch: {
+    currentCard: {
+      deep: true,
+      handler(card) {
+        if (card) {
+          this.card = card;
+          this.newCardTitle = card.title;
+          this.columnTitle = card.columnId.title;
+          this.newCardDescription = card.description || "";
+          this.tempCardDescription = card.description || "";
+          this.newCardTags = card.tags || [];
+        }
+      }
+    },
     dialog: {
       immediate: true,
       handler(dialog) {
@@ -236,12 +271,6 @@ export default {
         add_tag: false,
         add_dueDate: false
       },
-      items: [
-        { title: "Click Me" },
-        { title: "Click Me" },
-        { title: "Click Me" },
-        { title: "Click Me 2" }
-      ],
       isShown: false,
       isCardTitleEdited: false,
       isDescriptionEdited: false,
@@ -252,6 +281,7 @@ export default {
       newCardDescription: "",
       tempCardDescription: "",
       newComment: "",
+      newCardTags: [],
       menuItems: [
         {
           id: "add_tag",
@@ -271,15 +301,24 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentBoard", "me", "allTags"])
+    ...mapGetters(["currentBoard", "me", "allTags", "currentCard"])
   },
   methods: {
-    ...mapActions(["upsertCard", "getAllTags"]),
+    ...mapActions(["upsertCard", "getAllTags", "addTagToCard"]),
+    async handleTagClick(tag) {
+      if (tag._id) {
+        const tagInput = { _id: tag._id, cardId: this.currentCard._id };
+        await this.addTagToCard({ tagInput });
+      }
+    },
+
+    async handleRemoveTagFromCard(tagId) {
+      console.log(tagId);
+    },
+
     async handleMenuClick(itemId) {
-      console.log(itemId);
       switch (itemId) {
         case "add_tag":
-          console.log("addtag");
           await this.getAllTags();
           break;
         default:
@@ -349,9 +388,10 @@ export default {
     if (card) {
       this.card = card;
       this.newCardTitle = card.title;
-      this.columnTitle = card.column.title;
+      this.columnTitle = card.columnId.title;
       this.newCardDescription = card.description || "";
       this.tempCardDescription = card.description || "";
+      this.newCardTags = card.tags || [];
     }
   }
 };
@@ -363,12 +403,16 @@ export default {
     .editCardModal__card
       .editCardModal__card__content
         flex-direction row !important
+        width 100%
+        .editCardModal__card__content__cardMenu
+          order 2 !important
+          flex-grow 1 !important
         .editCardModal__card__content__cardBody
-          width 70%
+          order 1 !important
+          max-width 70%
           .cardContentBlock
             padding-right 20px
-          .textArea, .description_actions, .cardDescription--value, .noDescription
-            margin-left 30px
+
           .avatar
             display block
 
@@ -381,10 +425,27 @@ export default {
         flex-direction column
         .editCardModal__card__header
             position relative
-            max-height 80px
             display flex
             flex-direction column
-            justify-content center
+            justify-content flex-start
+            .cardContentBlock
+              position relative
+              &:not(:first-child)
+                margin-top 30px
+              .noDescription
+                padding 10px 10px 30px 10px
+                display block
+                background-color #E2E4E9
+                font-size 0.8rem
+                border-radius 5px
+                cursor pointer
+                margin 0 15px 0 35px
+              .cardDescription--value
+                cursor pointer
+                &:hover
+                  text-decoration underline
+              .tag
+                cursor pointer
             .editCardModal__card__header__text
                 width 90%
                 margin-right auto
@@ -407,7 +468,8 @@ export default {
             .avatar
               display none
             .editCardModal__card__content__cardMenu
-                flex-grow 1
+                flex-grow 0
+                order 1
                 .cardMenu_header
                   font-size 12px
                   font-weight 500
@@ -416,40 +478,16 @@ export default {
                   display flex
                   flex-direction column
                   justify-content flex-start
-                  .cardMenu_items_item
-                    display block
-                    background-color #E2E4E9
-                    padding 5px
-                    font-size 0.9rem
-                    margin 5px 0
-                    border-radius 5px
-                    cursor pointer
-                    transition background-color .5 ease-in
-                    &:hover
-                      background-color #c6ccd3
+
             .editCardModal__card__content__cardBody
                 flex-grow 1
-                .cardContentBlock
-                    position relative
-                    &:not(:first-child)
-                      margin-top 30px
-                    .noDescription
-                      padding 10px 10px 30px 10px
-                      display block
-                      background-color #E2E4E9
-                      font-size 0.8rem
-                      border-radius 5px
-                      cursor pointer
-                    .cardDescription--value
-                      cursor pointer
-                      &:hover
-                        text-decoration underline
-                    .comment
-                      position relative
-                      .comment_actions
-                        position absolute
-                        bottom 5px
-                        left 85px
-                        height 30px
-                        width calc(100% - 85px)
+                order 2
+                .comment
+                  position relative
+                  .comment_actions
+                    position absolute
+                    bottom 5px
+                    left 85px
+                    height 30px
+                    width calc(100% - 85px)
 </style>

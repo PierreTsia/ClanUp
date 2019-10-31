@@ -22,3 +22,29 @@ export const NORMALIZE_CARDS_ORDER = gql`
     normalizeCardOrder(cardOrderInputs: $cardOrderInputs)
   }
 `;
+
+export const CARD_BY_ID = gql`
+  query($cardId: ID!) {
+    cardById(cardId: $cardId) {
+      _id
+      title
+      position
+      description
+      columnId {
+        _id
+        title
+      }
+      comments {
+        author {
+          _id
+          username
+        }
+      }
+      tags {
+        _id
+        label
+        color
+      }
+    }
+  }
+`;

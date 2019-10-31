@@ -91,7 +91,7 @@
                       cardsByColumnsId[column._id]
                     )"
                     :key="card._id"
-                    @click.native="handleCardClick(card)"
+                    @click.native="handleCardClick(card._id)"
                   >
                     <v-card light class="card-container mb-2">
                       <h4 class="pa-2">{{ card.title }}</h4>
@@ -196,6 +196,7 @@ export default {
   methods: {
     ...mapActions([
       "getBoardById",
+      "getCardById",
       "updateBoard",
       "updateColumnTitle",
       "upsertColumn",
@@ -252,15 +253,13 @@ export default {
       await this.updateBoard({ boardId: this.currentBoard._id, boardInput });
       this.isBoardNameEdited = !this.isBoardNameEdited;
     },
-    handleCardClick(card) {
-      console.log(card);
-      const cardColumn = this.boardColumns.find(
-        c => c._id === card.columnId._id
-      );
+    async handleCardClick(cardId) {
+      const card = await this.getCardById({ cardId });
+
       this.openModal({
         name: "edit-card-modal",
         props: {
-          card: { ...card, column: cardColumn },
+          card,
           onConfirmClick: async cardInput => {
             console.log(cardInput);
             // this.closeModal();

@@ -1,15 +1,16 @@
 <template>
-  <v-list>
-    <v-list-item v-for="(item, index) in items" :key="index">
-      <v-list-item-action>
-        <v-switch color="purple"></v-switch>
-      </v-list-item-action>
-      <v-list-item-title>{{ item.label }}</v-list-item-title>
-    </v-list-item>
+  <v-list class="tagMenu pl-2">
+    <TagLabel
+      v-for="(tag, index) in displayTags"
+      :tag="tag"
+      :key="index"
+      @onSelect="$emit('onTagSelect', tag)"
+    />
   </v-list>
 </template>
 
 <script>
+import TagLabel from "@/components/base/menus/TagLabel.vue";
 import { mapGetters } from "vuex";
 export default {
   name: "TagMenu",
@@ -18,20 +19,45 @@ export default {
       immediate: true,
       handler(tags) {
         if (tags) {
-          this.items = tags;
+          this.cardTags = tags;
         }
       }
     }
   },
-  computed: {
-    ...mapGetters(["allTags"])
+  components: {
+    TagLabel
   },
   data() {
     return {
-      items: []
+      value: true,
+      cardTags: [],
+      defaultTags: [
+        { label: "", color: "#F3D43D" },
+        { label: "", color: "#FF9D38" },
+        { label: "", color: "#4FBC5A" },
+        { label: "", color: "#F3594C" },
+        { label: "", color: "#C877DB" },
+        { label: "", color: "#0079BA" }
+      ]
     };
-  }
+  },
+  computed: {
+    ...mapGetters(["allTags", "currentCardTagsIds"]),
+    displayTags() {
+      return [...this.allTags, ...this.defaultTags].slice(0, 6);
+    }
+  },
+  methods: {}
 };
 </script>
 
-<style scoped></style>
+<style lang="stylus">
+.tagMenu
+    .tagContainer
+        min-height 40px
+        padding 0 2px
+    .v-chip
+        &.tag
+            width 100%
+            cursor pointer
+</style>

@@ -20,8 +20,8 @@ import {
   UPDATE_COLUMN_TITLE
 } from "./columns";
 
-import { UPSERT_CARD, NORMALIZE_CARDS_ORDER } from "./cards";
-import { ALL_TAGS } from "./tags";
+import { UPSERT_CARD, NORMALIZE_CARDS_ORDER, CARD_BY_ID } from "./cards";
+import { ALL_TAGS, ADD_TAG_TO_CARD } from "./tags";
 export {
   GET_CURRENT_USER,
   SIGNIN_USER,
@@ -38,5 +38,7 @@ export {
   UPDATE_COLUMN_TITLE,
   UPSERT_CARD,
   NORMALIZE_CARDS_ORDER,
-  ALL_TAGS
+  ALL_TAGS,
+  ADD_TAG_TO_CARD,
+  CARD_BY_ID
 };

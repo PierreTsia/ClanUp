@@ -8,3 +8,17 @@ export const ALL_TAGS = gql`
     }
   }
 `;
+
+export const ADD_TAG_TO_CARD = gql`
+  mutation($tagInput: TagInput!) {
+    addTagToCard(tagInput: $tagInput) {
+      _id
+      title
+      tags {
+        _id
+        label
+        color
+      }
+    }
+  }
+`;

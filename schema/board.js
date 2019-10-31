@@ -75,10 +75,16 @@ const boardResolvers = {
           populate: {
             path: "cards",
             model: "Card",
-            populate: {
-              path: "tags",
-              model: "Tag"
-            }
+            populate: [
+              {
+                path: "tags",
+                model: "Tag"
+              },
+              {
+                path: "columnId",
+                model: "Column"
+              }
+            ]
           }
         }
       ]);

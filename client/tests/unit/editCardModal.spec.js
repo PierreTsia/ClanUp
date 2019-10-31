@@ -10,13 +10,18 @@ localVue.use(Vuex);
 
 describe("EditCardModal.vue", () => {
   const modalProps = {
-    card: { _id: "1", title: "test", column: { title: "column-test" } }
+    card: { _id: "1", title: "test", columnId: { title: "column-test" } }
   };
   const store = {
     getters: {
       currentBoard: () => {},
       me: () => {},
-      allTags: () => []
+      allTags: () => [],
+      currentCard: () => ({
+        _id: "1",
+        title: "test",
+        columnId: { title: "column-test" }
+      })
     }
   };
 
