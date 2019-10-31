@@ -1,6 +1,10 @@
 import * as types from "../mutation-types";
 import { defaultClient as apolloClient } from "../../main";
-import { ADD_TAG_TO_CARD, ALL_TAGS } from "../../../queries";
+import {
+  ADD_TAG_TO_CARD,
+  ALL_TAGS,
+  REMOVE_TAG_FROM_CARD
+} from "../../../queries";
 
 export const state = {
   allTags: [],
@@ -12,7 +16,6 @@ export const getters = {
 
 export const actions = {
   getAllTags: async ({ commit }) => {
-    console.log("salut");
     try {
       const { data } = await apolloClient.query({
         query: ALL_TAGS
@@ -28,8 +31,22 @@ export const actions = {
         mutation: ADD_TAG_TO_CARD,
         variables: payload
       });
-      console.log("action", data.addTagToCard);
-      commit(types.ADD_TAG_TO_CARD_SUCCESS, data.addTagToCard.tags);
+      commit(types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS, data.addTagToCard.tags);
+    } catch (e) {
+      console.warn(e);
+    }
+  },
+
+  removeTagFromCard: async ({ commit }, payload) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: REMOVE_TAG_FROM_CARD,
+        variables: payload
+      });
+      commit(
+        types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS,
+        data.removeTagFromCard.tags
+      );
     } catch (e) {
       console.warn(e);
     }

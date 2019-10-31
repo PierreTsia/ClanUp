@@ -22,3 +22,16 @@ export const ADD_TAG_TO_CARD = gql`
     }
   }
 `;
+
+export const REMOVE_TAG_FROM_CARD = gql`
+  mutation($cardId: ID!, $tagId: ID!) {
+    removeTagFromCard(tagId: $tagId, cardId: $cardId) {
+      _id
+      tags {
+        _id
+        label
+        color
+      }
+    }
+  }
+`;

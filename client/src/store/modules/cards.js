@@ -28,7 +28,6 @@ export const actions = {
         query: CARD_BY_ID,
         variables: cardId
       });
-      console.log(data);
       commit(types.GET_CURRENT_CARD_SUCCESS, data.cardById);
       return data.cardById;
     } catch (e) {
@@ -62,7 +61,6 @@ export const actions = {
 export const mutations = {
   [types.GET_BOARD_BY_ID_SUCCESS]: (state, board) => {
     const { columns } = board;
-    console.log(columns);
     if (columns && columns.length) {
       state.currentBoardCards = flatMap(columns, col => col.cards);
     }
@@ -83,7 +81,7 @@ export const mutations = {
     }
   },
   [types.GET_CURRENT_CARD_SUCCESS]: (state, card) => (state.currentCard = card),
-  [types.ADD_TAG_TO_CARD_SUCCESS]: (state, tags) =>
+  [types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS]: (state, tags) =>
     console.log(tags)((state.currentCard = { ...state.currentCard, tags }))
 };
 

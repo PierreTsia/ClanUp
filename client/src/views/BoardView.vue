@@ -135,7 +135,6 @@ export default {
       immediate: true,
       async handler(newBoardId, oldBoardId) {
         if (!oldBoardId && newBoardId) {
-          console.log(newBoardId);
           await this.getBoardById(newBoardId);
         }
       }

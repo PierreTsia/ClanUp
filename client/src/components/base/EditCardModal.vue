@@ -304,7 +304,12 @@ export default {
     ...mapGetters(["currentBoard", "me", "allTags", "currentCard"])
   },
   methods: {
-    ...mapActions(["upsertCard", "getAllTags", "addTagToCard"]),
+    ...mapActions([
+      "upsertCard",
+      "getAllTags",
+      "addTagToCard",
+      "removeTagFromCard"
+    ]),
     async handleTagClick(tag) {
       if (tag._id) {
         const tagInput = { _id: tag._id, cardId: this.currentCard._id };
@@ -313,7 +318,7 @@ export default {
     },
 
     async handleRemoveTagFromCard(tagId) {
-      console.log(tagId);
+      await this.removeTagFromCard({ tagId, cardId: this.currentCard._id });
     },
 
     async handleMenuClick(itemId) {

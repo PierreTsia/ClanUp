@@ -47,6 +47,7 @@ const card = gql`
     upsertCard(cardInput: CardInput!): Card
     normalizeCardOrder(cardOrderInputs: [CardOrderInput]!): Boolean
     addTagToCard(tagInput: TagInput!): Card
+    removeTagFromCard(tagId: ID!, cardId: ID!): Card
   }
 `;
 
@@ -106,6 +107,40 @@ const cardResolvers = {
 
       return savedCard;
     },
+    removeTagFromCard: async (
+      _,
+      { tagId, cardId },
+      { currentUser, Card, Tag }
+    ) => {
+      if (!currentUser) {
+        throw Error("Authentication required");
+      }
+
+      const card = await Card.findById(cardId);
+
+      if (!card) {
+        throw Error(`No card found with id ${cardId}`);
+      }
+
+      if (!card.author.equals(currentUser._id)) {
+        throw Error("Only owner can update a card");
+      }
+
+      const tag = await Tag.findById(tagId);
+
+      if (!tag) {
+        throw Error(`No tag found with id ${tagId}`);
+      }
+
+      const newCard = await Card.findOneAndUpdate(
+        { _id: cardId },
+        { $pullAll: { tags: [tag._id] } },
+        { new: true }
+      ).populate([{ path: "tags", model: "Tag" }]);
+
+      return newCard;
+    },
+
     upsertCard: async (
       _,
       { cardInput },
