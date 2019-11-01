@@ -51,6 +51,13 @@ const tagResolvers = {
       if (!_id) {
         const newTag = await new Tag({ label, color, board }).save();
         return newTag;
+      } else {
+        const updatedTag = await Tag.findOneAndUpdate(
+          { _id },
+          { label, color, board },
+          { new: true }
+        );
+        return updatedTag;
       }
     },
     deleteTag: async (_, { _id }, { Tag, currentUser }) => {

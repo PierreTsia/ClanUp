@@ -2,7 +2,7 @@
   <v-card>
     <v-list-item>
       <v-list-item-content class="py-0">
-        <v-list-item-subtitle>{{ item.title }}</v-list-item-subtitle>
+        <slot name="title" />
       </v-list-item-content>
 
       <v-list-item-action>
@@ -14,11 +14,8 @@
     <v-divider></v-divider>
 
     <slot name="menuContent" />
-
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn text @click="menu = false">Cancel</v-btn>
-      <v-btn color="primary" text @click="menu = false">Save</v-btn>
+    <v-card-actions class="d-flex justify-center">
+      <slot name="menuActions" />
     </v-card-actions>
   </v-card>
 </template>

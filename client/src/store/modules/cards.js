@@ -84,9 +84,23 @@ export const mutations = {
       }
     }
   },
+  [types.UPSERT_TAG_SUCCESS]: (state, tag) => {
+    const tagIndex = state.currentCard.tags.findIndex(t => t._id === tag._id);
+    if (tagIndex > -1) {
+      state.currentCard = {
+        ...state.currentCard,
+        tags: [
+          ...state.currentCard.tags.slice(0, tagIndex),
+          tag,
+          ...state.currentCard.tags.slice(tagIndex + 1)
+        ]
+      };
+    }
+  },
+
   [types.GET_CURRENT_CARD_SUCCESS]: (state, card) => (state.currentCard = card),
   [types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS]: (state, tags) =>
-    console.log(tags)((state.currentCard = { ...state.currentCard, tags }))
+    (state.currentCard = { ...state.currentCard, tags })
 };
 
 export default {

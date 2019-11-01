@@ -1,16 +1,27 @@
 <template>
-  <v-list class="tagMenu pl-2">
-    <TagLabel
-      v-for="(tag, index) in displayTags"
-      :tag="tag"
-      :key="index"
-      @onSelect="$emit('onTagSelect', tag)"
-    />
+  <v-list class="tagMenu">
+    <template v-if="!isTagEdited">
+      <ExistingTag
+        v-for="(tag, index) in displayTags"
+        :tag="tag"
+        :key="index"
+        @onSelect="$emit('onTagSelect', tag)"
+        @onEdit="handleTagEdit"
+      />
+    </template>
+    <template v-else>
+      <EditedTag
+        :tag="editedTag"
+        @onLabelChange="label => $emit('onLabelChange', label)"
+        @onColorChange="color => $emit('onColorChange', color)"
+      />
+    </template>
   </v-list>
 </template>
 
 <script>
-import TagLabel from "@/components/base/menus/TagLabel.vue";
+import ExistingTag from "@/components/base/menus/ExistingTag";
+import EditedTag from "@/components/base/menus/EditedTag";
 import { mapGetters } from "vuex";
 export default {
   name: "TagMenu",
@@ -25,29 +36,35 @@ export default {
     }
   },
   components: {
-    TagLabel
+    ExistingTag,
+    EditedTag
+  },
+  props: {
+    editedTag: {
+      type: Object,
+      default: () => {}
+    }
   },
   data() {
     return {
       value: true,
-      cardTags: [],
-      defaultTags: [
-        /*  { label: "", color: "#F3D43D" },
-        { label: "", color: "#FF9D38" },
-        { label: "", color: "#4FBC5A" },
-        { label: "", color: "#F3594C" },
-        { label: "", color: "#C877DB" },
-        { label: "", color: "#0079BA" }*/
-      ]
+      cardTags: []
     };
   },
   computed: {
     ...mapGetters(["allTags", "currentCardTagsIds"]),
     displayTags() {
       return [...this.allTags].slice(0, 6);
+    },
+    isTagEdited() {
+      return this.editedTag && this.editedTag.color;
     }
   },
-  methods: {}
+  methods: {
+    handleTagEdit(tag) {
+      this.$emit("onTagEdited", tag);
+    }
+  }
 };
 </script>
 

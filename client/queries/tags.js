@@ -5,6 +5,18 @@ export const ALL_TAGS = gql`
       _id
       label
       color
+      board
+    }
+  }
+`;
+
+export const UPSERT_TAG = gql`
+  mutation($label: String!, $color: String!, $board: ID!, $_id: ID) {
+    upsertTag(label: $label, color: $color, board: $board, _id: $_id) {
+      label
+      color
+      _id
+      board
     }
   }
 `;
@@ -15,6 +27,7 @@ export const BOARD_TAGS = gql`
       _id
       label
       color
+      board
     }
   }
 `;

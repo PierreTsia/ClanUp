@@ -205,11 +205,40 @@
                 </v-btn>
               </template>
               <ContextualMenu :item="item" @onCloseClick="handleCloseClick">
+                <v-list-item-subtitle
+                  slot="title"
+                  class="d-flex align-center justify-start text-center"
+                >
+                  <v-icon
+                    class="d-block"
+                    @click.native="handleGoBack"
+                    v-if="editedTag"
+                    >mdi-chevron-left</v-icon
+                  >
+                  <span class="d-block flex-grow-1 text--center">
+                    {{ editedTag ? "Edit Tag" : item.title }}
+                  </span>
+                </v-list-item-subtitle>
+
                 <template slot="menuContent">
                   <component
                     :is="item.component"
+                    :editedTag="editedTag"
                     @onTagSelect="handleTagClick"
+                    @onTagEdited="handleTagIsEdited"
+                    @onColorChange="handleColorChange"
+                    @onLabelChange="handleLabelChange"
                   />
+                </template>
+                <template slot="menuActions" v-if="editedTag">
+                  <v-btn color="error" @click="handleCloseClick(item.id)"
+                    >Cancel</v-btn
+                  >
+                  <v-btn
+                    color="success"
+                    @click="handleConfirmActionMenuClick(item.id)"
+                    >Save</v-btn
+                  >
                 </template>
               </ContextualMenu>
             </v-menu>
@@ -282,6 +311,8 @@ export default {
       tempCardDescription: "",
       newComment: "",
       newCardTags: [],
+      editedTag: null,
+      newTag: { color: null, label: null },
       menuItems: [
         {
           id: "add_tag",
@@ -307,15 +338,55 @@ export default {
       "allTags",
       "currentCard",
       "currentCardTagsIds"
-    ])
+    ]),
+    tagContentHadBeenModified() {
+      const oldLabel = this.editedTag.label;
+      const oldColor = this.editedTag.color;
+      const newLabel = this.newTag.label;
+      const newColor = this.newTag.color;
+
+      return (
+        newColor && newLabel && (newColor !== oldColor || newLabel !== oldLabel)
+      );
+    }
   },
   methods: {
     ...mapActions([
       "upsertCard",
+      "upsertTag",
       "getBoardTags",
       "addTagToCard",
       "removeTagFromCard"
     ]),
+    handleColorChange(color) {
+      this.newTag.color = color;
+    },
+    handleLabelChange(label) {
+      this.newTag.label = label;
+    },
+    async addNewTag() {
+      if (this.tagContentHadBeenModified) {
+        const newTagInput = { board: this.currentBoard._id, ...this.newTag };
+        if (this.editedTag && this.editedTag.board) {
+          newTagInput["_id"] = this.editedTag._id;
+        }
+        await this.upsertTag(newTagInput);
+        this.editedTag = null;
+      }
+
+    },
+    async handleConfirmActionMenuClick(itemId) {
+      if (itemId === "add_tag") {
+        await this.addNewTag();
+      }
+    },
+    handleGoBack() {
+      this.editedTag = null;
+    },
+    handleTagIsEdited(tag) {
+      const { color, label, board, _id } = tag;
+      this.editedTag = { color, label, board, _id };
+    },
     async handleTagClick(tag) {
       if (!this.currentCardTagsIds.includes(tag._id)) {
         const tagInput = { _id: tag._id, cardId: this.currentCard._id };

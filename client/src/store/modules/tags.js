@@ -3,7 +3,8 @@ import { defaultClient as apolloClient } from "../../main";
 import {
   ADD_TAG_TO_CARD,
   BOARD_TAGS,
-  REMOVE_TAG_FROM_CARD
+  REMOVE_TAG_FROM_CARD,
+  UPSERT_TAG
 } from "../../../queries";
 
 export const state = {
@@ -16,7 +17,6 @@ export const getters = {
 
 export const actions = {
   getBoardTags: async ({ commit }, payload) => {
-    console.log("salut", payload);
     try {
       const { data } = await apolloClient.query({
         query: BOARD_TAGS,
@@ -52,11 +52,35 @@ export const actions = {
     } catch (e) {
       console.warn(e);
     }
+  },
+
+  upsertTag: async ({ commit }, payload) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPSERT_TAG,
+        variables: payload
+      });
+      commit(types.UPSERT_TAG_SUCCESS, data.upsertTag);
+    } catch (e) {
+      console.warn(e);
+    }
   }
 };
 
 export const mutations = {
-  [types.FETCH_TAGS_SUCCESS]: (state, tags) => (state.allTags = tags)
+  [types.FETCH_TAGS_SUCCESS]: (state, tags) => (state.allTags = tags),
+  [types.UPSERT_TAG_SUCCESS]: (state, tag) => {
+    const tagIndex = state.allTags.findIndex(t => t._id === tag._id);
+    if (tagIndex > -1) {
+      state.allTags = [
+        ...state.allTags.slice(0, tagIndex),
+        tag,
+        ...state.allTags.slice(tagIndex + 1)
+      ];
+    } else {
+      state.allTags.unshift(tag);
+    }
+  }
 };
 
 export default {

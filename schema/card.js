@@ -15,7 +15,7 @@ const card = gql`
   }
   input TagInput {
     cardId: ID!
-    _id: ID!
+    _id: ID
   }
 
   type Comment {
