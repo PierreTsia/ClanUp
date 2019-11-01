@@ -78,6 +78,10 @@ export const mutations = {
         newCard,
         ...state.currentBoardCards.slice(index + 1)
       ];
+
+      if (state.currentCard._id === newCard._id) {
+        state.currentCard = newCard;
+      }
     }
   },
   [types.GET_CURRENT_CARD_SUCCESS]: (state, card) => (state.currentCard = card),
