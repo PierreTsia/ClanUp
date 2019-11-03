@@ -11,7 +11,7 @@
         v-model="newTagLabel"
       ></v-text-field>
     </div>
-    <span class="d-flex pa-4 py-2 caption accent--text font-weight-bold"
+    <span class="d-flex pa-4 py-2 caption font-weight-bold"
       >Select a color</span
     >
     <v-list-item class="py-0 mt-0 d-flex flex-wrap justify-space-between">

@@ -373,7 +373,6 @@ export default {
         await this.upsertTag(newTagInput);
         this.editedTag = null;
       }
-
     },
     async handleConfirmActionMenuClick(itemId) {
       if (itemId === "add_tag") {

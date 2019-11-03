@@ -1,6 +1,16 @@
 <template>
   <v-list class="tagMenu">
     <template v-if="!isTagEdited">
+      <div class="editedTag_input pl-2 pr-2 mb-5">
+        <v-text-field
+          v-model="searchQuery"
+          outlined
+          dense
+          flat
+          hide-details
+          label="Find a tag"
+        ></v-text-field>
+      </div>
       <ExistingTag
         v-for="(tag, index) in displayTags"
         :tag="tag"
@@ -8,6 +18,23 @@
         @onSelect="$emit('onTagSelect', tag)"
         @onEdit="handleTagEdit"
       />
+
+      <div
+        class="tagMenu__actions pl-2 pr-7 d-flex justify-center align-end py-2 mt-5"
+      >
+        <v-chip
+          class="tag text-center"
+          filter
+          color="success"
+          label
+          @click="handleCreateNewClick"
+        >
+          <div class="d-block mx-auto">
+            <v-icon size="16">mdi-plus-circle</v-icon>
+            create new
+          </div>
+        </v-chip>
+      </div>
     </template>
     <template v-else>
       <EditedTag
@@ -48,21 +75,39 @@ export default {
   data() {
     return {
       value: true,
-      cardTags: []
+      cardTags: [],
+      searchQuery: ""
     };
   },
   computed: {
-    ...mapGetters(["allTags", "currentCardTagsIds"]),
+    ...mapGetters(["allTags", "currentCardTagsIds", "currentBoard"]),
     displayTags() {
-      return [...this.allTags].slice(0, 6);
+      return !this.searchQuery.length
+        ? [...this.allTags].slice(0, 6)
+        : [...this.allTags].filter(tag =>
+            this.searchTags(tag, this.searchQuery)
+          );
     },
     isTagEdited() {
       return this.editedTag && this.editedTag.color;
     }
   },
   methods: {
+    searchTags(tag, query) {
+      const pattern = new RegExp(query, "gi");
+      return pattern.test(tag.label);
+    },
     handleTagEdit(tag) {
       this.$emit("onTagEdited", tag);
+    },
+    handleCreateNewClick() {
+      const newTag = {
+        color: "#1483BB",
+        label: this.searchQuery,
+        board: this.currentBoard._id,
+        _id: null
+      };
+      this.handleTagEdit(newTag);
     }
   }
 };
@@ -77,4 +122,6 @@ export default {
         &.tag
             width 100%
             cursor pointer
+        .v-chip__content
+          flex-grow 1
 </style>
