@@ -111,7 +111,12 @@
               </h3>
             </v-flex>
             <v-flex xs12 class="d-flex align-center comment pl-sm-5">
-              <v-avatar color="indigo" size="36" class="avatar">
+              <v-avatar
+                v-if="me && me.avatar"
+                color="indigo"
+                size="36"
+                class="avatar"
+              >
                 <img :src="me.avatar" alt="avatar" />
               </v-avatar>
               <v-textarea
@@ -291,6 +296,7 @@ export default {
     ]),
 
     async handleMenuClick(itemId) {
+      this.activeMenuId = itemId;
       switch (itemId) {
         case "add_tag":
           await this.getBoardTags({ boardId: this.currentBoard._id });
@@ -316,7 +322,6 @@ export default {
       }
     },
     async handleConfirmActionMenuClick(itemId) {
-      console.log(itemId);
       if (itemId === "add_tag") {
         await this.addNewTag();
       }
@@ -363,9 +368,9 @@ export default {
         this.newCardTitle = newCardTitle;
         const cardInput = {
           _id: this.card._id,
-          title: this.newCardTitle,
-          position: this.card.position,
           columnId: this.card.columnId._id,
+          position: this.card.position,
+          title: this.newCardTitle,
           boardId: this.currentBoard._id
         };
         await this.upsertCard({ cardInput });
@@ -432,7 +437,6 @@ export default {
           max-width 70%
           .cardContentBlock
             padding-right 20px
-
           .avatar
             display block
 
@@ -476,7 +480,7 @@ export default {
               &.close
                 position absolute
                 right 5px
-                top 5px
+                top 15px
                 cursor pointer
               &.title
                 left 5px
