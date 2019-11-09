@@ -1,5 +1,7 @@
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import EditCardModal from "@/components/base/EditCardModal";
+import EditCardModalHeader from "@/components/base/editCardModal/EditCardModalHeader";
+import createStub from "./support/createStubWithProps";
 import Vue from "vue";
 import Vuetify from "vuetify";
 import Vuex from "vuex";
@@ -29,54 +31,69 @@ describe("EditCardModal.vue", () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
       store,
+
       propsData: {
         modalProps
       }
     });
     expect(wrapper).toBeDefined();
   });
-  it("should display the card title ", () => {
+  it("should display the card title ", async () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
       store,
+      stubs: { EditCardModalHader: createStub(EditCardModalHeader) },
       propsData: {
         modalProps
       }
     });
+    await wrapper.vm.$nextTick();
 
-    const title = wrapper.find(".cardTitle");
-    expect(title.exists()).toBe(true);
-    expect(title.text()).toEqual("test");
+    expect(wrapper.find(EditCardModalHeader).props("cardTitle")).toEqual(
+      modalProps.card.title
+    );
   });
 
-  it("should display the title of the card column", () => {
+  it("should display the title of the card column", async () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
       store,
+      stubs: { EditCardModalHader: createStub(EditCardModalHeader) },
+
       propsData: {
         modalProps
       }
     });
-    const subtitle = wrapper.find(".columnName");
-    expect(subtitle.exists()).toBe(true);
-    expect(subtitle.text()).toEqual("From list column-test");
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find(EditCardModalHeader).props("columnTitle")).toEqual(
+      modalProps.card.columnId.title
+    );
   });
 
-  it("should display a text input if title is clicked", async () => {
+  it("should toggle titleIsEdited and pass it as a prop to header sub component", async () => {
     const wrapper = shallowMount(EditCardModal, {
       localVue,
       store,
+      stubs: { EditCardModalHader: createStub(EditCardModalHeader) },
+
       propsData: {
         modalProps
       }
     });
-    const title = wrapper.find(".cardTitle");
+
+    await wrapper.vm.$nextTick();
     expect(wrapper.vm.isCardTitleEdited).toEqual(false);
+    expect(
+      wrapper.find(EditCardModalHeader).props("isCardTitleEdited")
+    ).toEqual(false);
 
-    title.trigger("click");
+    const header = wrapper.find(EditCardModalHeader);
+    header.vm.$emit("onEditTitleClick");
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.isCardTitleEdited).toEqual(true);
-    const textField = wrapper.find(".textField");
-    expect(textField.exists()).toEqual(true);
+    expect(
+      wrapper.find(EditCardModalHeader).props("isCardTitleEdited")
+    ).toEqual(true);
   });
 });

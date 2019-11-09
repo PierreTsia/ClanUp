@@ -41,6 +41,8 @@
         :tag="editedTag"
         @onLabelChange="label => $emit('onLabelChange', label)"
         @onColorChange="color => $emit('onColorChange', color)"
+        @onCancelClick="$emit('onCancelEditTagClick')"
+        @onConfirmEditTagClick="$emit('onConfirmEditTagClick')"
       />
     </template>
   </v-list>

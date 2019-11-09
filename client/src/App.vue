@@ -2,7 +2,7 @@
   <v-app id="inspire">
     <component
       :is="activeModalName"
-      :dialog="isActiveModal(this.activeModalName)"
+      :dialog="isActiveModal(activeModalName)"
       :modalProps="modalProps"
       @onClickOutside="closeModal()"
     ></component>

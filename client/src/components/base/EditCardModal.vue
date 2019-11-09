@@ -11,36 +11,14 @@
       class="editCardModal__card accent--text px-4"
     >
       <div class="editCardModal__card__header pt-4">
-        <v-flex xs12 class="editCardModal__card__header__text mb-4">
-          <span class="d-flex align-center">
-            <v-icon class="title mr-2" color="accent" size="24"
-              >mdi-subtitles</v-icon
-            >
+        <EditCardModalHeader
+          :isCardTitleEdited="isCardTitleEdited"
+          :columnTitle="columnTitle"
+          :cardTitle="newCardTitle"
+          @onEditTitleClick="isCardTitleEdited = !isCardTitleEdited"
+          @onBlur="handleEditCardTitle"
+        />
 
-            <h3
-              class="cardTitle"
-              v-if="!isCardTitleEdited"
-              @click="isCardTitleEdited = !isCardTitleEdited"
-            >
-              {{ newCardTitle }}
-            </h3>
-            <v-text-field
-              class="textField"
-              v-else
-              dense
-              hide-details
-              max-width="400px"
-              v-model="newCardTitle"
-              autofocus
-              light
-              @blur="handleEditCardTitle"
-            ></v-text-field>
-          </span>
-
-          <small class="d-block flex-grow-1 accent--text  pl-8 columnName"
-            >From list {{ columnTitle }}</small
-          >
-        </v-flex>
         <v-flex v-if="newCardTags && newCardTags.length">
           <div class=" d-flex flex-grow-1 pl-8 mb-3 cardContentBlock">
             <v-chip
@@ -172,78 +150,27 @@
             </v-flex>
           </div>
         </v-flex>
-        <v-flex class="editCardModal__card__content__cardMenu">
-          <span class="text-start cardMenu_header px-3">
-            Add to the card
-          </span>
-          <section class="cardMenu_items px-3">
-            <v-menu
-              :content-class="`menu_${item.id}`"
-              :ref="`menuRef_${item.id}`"
-              v-for="item in menuItems"
-              :key="item.id"
-              transition="slide-y-transition"
-              offset-y
-              :close-on-click="true"
-              :close-on-content-click="false"
-              nudge-bottom="5"
-              bottom
-            >
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  text
-                  class="darkgrey text-left justify-start px-1 mb-2"
-                  color="accent"
-                  dark
-                  @click="handleMenuClick(item.id)"
-                  v-on="on"
-                >
-                  <v-icon color="accent" size="14" class="mr-2">{{
-                    item.icon
-                  }}</v-icon>
-                  {{ item.label }}
-                </v-btn>
-              </template>
-              <ContextualMenu :item="item" @onCloseClick="handleCloseClick">
-                <v-list-item-subtitle
-                  slot="title"
-                  class="d-flex align-center justify-start text-center"
-                >
-                  <v-icon
-                    class="d-block"
-                    @click.native="handleGoBack"
-                    v-if="editedTag"
-                    >mdi-chevron-left</v-icon
-                  >
-                  <span class="d-block flex-grow-1 text--center">
-                    {{ editedTag ? "Edit Tag" : item.title }}
-                  </span>
-                </v-list-item-subtitle>
 
-                <template slot="menuContent">
-                  <component
-                    :is="item.component"
-                    :editedTag="editedTag"
-                    @onTagSelect="handleTagClick"
-                    @onTagEdited="handleTagIsEdited"
-                    @onColorChange="handleColorChange"
-                    @onLabelChange="handleLabelChange"
-                  />
-                </template>
-                <template slot="menuActions" v-if="editedTag">
-                  <v-btn color="error" @click="handleCloseClick(item.id)"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    color="success"
-                    @click="handleConfirmActionMenuClick(item.id)"
-                    >Save</v-btn
-                  >
-                </template>
-              </ContextualMenu>
-            </v-menu>
-          </section>
-        </v-flex>
+        <EditCardModalMenu
+          ref="editCardMenu"
+          :menuItems="menuItems"
+          :editedTag="editedTag"
+          @onMenuClick="handleMenuClick"
+          @onCloseClick="handleCloseClick"
+        >
+          <template slot="menuContent">
+            <component
+              :is="activeMenu.component"
+              :editedTag="editedTag"
+              @onTagSelect="handleTagClick"
+              @onTagEdited="handleTagIsEdited"
+              @onColorChange="handleColorChange"
+              @onLabelChange="handleLabelChange"
+              @onConfirmEditTagClick="handleConfirmActionMenuClick('add_tag')"
+              @onCancelEditTagClick="handleGoBack"
+            />
+          </template>
+        </EditCardModalMenu>
       </v-layout>
     </v-card>
   </v-dialog>
@@ -251,11 +178,10 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import {
-  TagMenu,
-  DueDateMenu,
-  ContextualMenu
-} from "@/components/base/menus/index";
+import { TagMenu, DueDateMenu } from "@/components/base/menus/index";
+
+import EditCardModalHeader from "./editCardModal/EditCardModalHeader";
+import EditCardModalMenu from "./editCardModal/EditCardModalMenu";
 export default {
   name: "EditCardModal",
   props: {
@@ -292,7 +218,8 @@ export default {
   components: {
     TagMenu,
     DueDateMenu,
-    ContextualMenu
+    EditCardModalHeader,
+    EditCardModalMenu
   },
   data() {
     return {
@@ -300,6 +227,7 @@ export default {
         add_tag: false,
         add_dueDate: false
       },
+      activeMenuId: "add_tag",
       isShown: false,
       isCardTitleEdited: false,
       isDescriptionEdited: false,
@@ -348,6 +276,9 @@ export default {
       return (
         newColor && newLabel && (newColor !== oldColor || newLabel !== oldLabel)
       );
+    },
+    activeMenu() {
+      return this.menuItems.find(i => i.id === this.activeMenuId);
     }
   },
   methods: {
@@ -358,6 +289,16 @@ export default {
       "addTagToCard",
       "removeTagFromCard"
     ]),
+
+    async handleMenuClick(itemId) {
+      switch (itemId) {
+        case "add_tag":
+          await this.getBoardTags({ boardId: this.currentBoard._id });
+          break;
+        default:
+          return;
+      }
+    },
     handleColorChange(color) {
       this.newTag.color = color;
     },
@@ -375,6 +316,7 @@ export default {
       }
     },
     async handleConfirmActionMenuClick(itemId) {
+      console.log(itemId);
       if (itemId === "add_tag") {
         await this.addNewTag();
       }
@@ -402,15 +344,6 @@ export default {
       await this.removeTagFromCard({ tagId, cardId: this.currentCard._id });
     },
 
-    async handleMenuClick(itemId) {
-      switch (itemId) {
-        case "add_tag":
-          await this.getBoardTags({ boardId: this.currentBoard._id });
-          break;
-        default:
-          return;
-      }
-    },
     handleBlur(event) {
       if (
         !event.relatedTarget ||
@@ -420,13 +353,14 @@ export default {
       }
     },
     handleCloseClick(itemId) {
-      const menu = this.$refs[`menuRef_${itemId}`];
+      const menu = this.$refs.editCardMenu.$refs[`menuRef_${itemId}`];
       if (menu && menu[0]) {
         menu[0].isActive = false;
       }
     },
-    async handleEditCardTitle() {
-      if (this.newCardTitle.length && this.newCardTitle !== this.card.title) {
+    async handleEditCardTitle(newCardTitle) {
+      if (newCardTitle.length && newCardTitle !== this.card.title) {
+        this.newCardTitle = newCardTitle;
         const cardInput = {
           _id: this.card._id,
           title: this.newCardTitle,
