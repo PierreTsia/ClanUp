@@ -8,9 +8,25 @@
     <v-card
       color="grey"
       min-height="800"
-      class="editCardModal__card accent--text px-4"
+      class="editCardModal__card accent--text"
     >
-      <div class="editCardModal__card__header pt-4">
+      <template v-if="card && card.coverImg">
+        <v-img
+          class="white--text align-end cardCoverImg"
+          max-height="150px"
+          :src="card.coverImg"
+        >
+          <v-icon
+            class="deleteCover mr-2 pt-1"
+            color="white"
+            size="24"
+            @click="handleDeleteCoverImg"
+            >mdi-delete</v-icon
+          >
+        </v-img>
+      </template>
+
+      <div class="editCardModal__card__header px-4 mt-4">
         <EditCardModalHeader
           :isCardTitleEdited="isCardTitleEdited"
           :columnTitle="columnTitle"
@@ -99,7 +115,7 @@
           >mdi-close</v-icon
         >
       </div>
-      <v-layout class="editCardModal__card__content mt-4">
+      <v-layout class="editCardModal__card__content mt-4 px-4">
         <v-flex class="editCardModal__card__content__cardBody">
           <div class="cardContentBlock">
             <v-flex class="d-flex justify-start align-start mb-2">
@@ -173,6 +189,8 @@
               @onLabelChange="handleLabelChange"
               @onConfirmEditTagClick="handleConfirmActionMenuClick('add_tag')"
               @onCancelEditTagClick="handleGoBack"
+              @onSelectImg="handleImageIsSelected"
+              @onImageSaved="handleImageSaved"
             />
           </template>
         </EditCardModalMenu>
@@ -183,7 +201,11 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import { TagMenu, DueDateMenu } from "@/components/base/menus/index";
+import {
+  TagMenu,
+  DueDateMenu,
+  CoverImageMenu
+} from "@/components/base/menus/index";
 
 import EditCardModalHeader from "./editCardModal/EditCardModalHeader";
 import EditCardModalMenu from "./editCardModal/EditCardModalMenu";
@@ -223,6 +245,7 @@ export default {
   components: {
     TagMenu,
     DueDateMenu,
+    CoverImageMenu,
     EditCardModalHeader,
     EditCardModalMenu
   },
@@ -260,6 +283,13 @@ export default {
           icon: "mdi-clock-outline",
           component: "DueDateMenu",
           title: "Add a Due Date"
+        },
+        {
+          id: "add_coverImg",
+          label: "add cover",
+          icon: "mdi-image",
+          component: "CoverImageMenu",
+          title: "Add a Cover Image"
         }
       ]
     };
@@ -294,6 +324,35 @@ export default {
       "addTagToCard",
       "removeTagFromCard"
     ]),
+    async handleImageSaved({ url }) {
+      const cardInput = {
+        _id: this.card._id,
+        coverImg: url,
+        boardId: this.currentBoard._id,
+        columnId: this.card.columnId._id
+      };
+      await this.upsertCard({ cardInput });
+    },
+    async handleDeleteCoverImg() {
+      const cardInput = {
+        _id: this.card._id,
+        coverImg: null,
+        boardId: this.currentBoard._id,
+        columnId: this.card.columnId._id
+      };
+      await this.upsertCard({ cardInput });
+      this.card.coverImg = null;
+    },
+    async handleImageIsSelected(imgUrl) {
+      const cardInput = {
+        _id: this.card._id,
+        coverImg: imgUrl,
+        boardId: this.currentBoard._id,
+        columnId: this.card.columnId._id
+      };
+      await this.upsertCard({ cardInput });
+      this.card.coverImg = imgUrl;
+    },
 
     async handleMenuClick(itemId) {
       this.activeMenuId = itemId;
@@ -396,7 +455,7 @@ export default {
       }
     },
     handleClickOutside() {
-      this.$emit("onClickOutside");
+      this.$emit("onClose");
     },
 
     handleEditDescriptionCancel() {
@@ -447,6 +506,17 @@ export default {
         cursor default !important
         display flex
         flex-direction column
+        position relative
+        .cardCoverImg
+          &:hover
+            .deleteCover
+              display block
+        .deleteCover
+          display none
+          position absolute
+          left 5px
+          top 5px
+          cursor pointer
         .editCardModal__card__header
             position relative
             display flex
@@ -479,8 +549,8 @@ export default {
             .v-icon
               &.close
                 position absolute
-                right 5px
-                top 15px
+                right 15px
+                top -5px
                 cursor pointer
               &.title
                 left 5px

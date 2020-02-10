@@ -4,9 +4,9 @@
       :is="activeModalName"
       :dialog="isActiveModal(activeModalName)"
       :modalProps="modalProps"
-      @onClickOutside="closeModal()"
+      @onClose="closeModal()"
     ></component>
-    <NavigationDrawer :drawer="drawer" @onClickOutside="handleInputChange" />
+    <NavigationDrawer :drawer="drawer" @onClose="handleInputChange" />
     <Navbar @drawer="drawer = !drawer" />
     <v-content>
       <div class="fill-height" fluid>

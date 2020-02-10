@@ -98,8 +98,6 @@
                     </v-card>
                   </Draggable>
                 </Container>
-
-                <!--TODO COMPONENT-->
                 <ListFooter
                   :isEditing="isNewCardEditingColumnId === column._id"
                   @onCancel="isNewCardEditingColumnId = null"

@@ -78,7 +78,7 @@ export default {
   methods: {
     ...mapActions(["setAppTheme"]),
     handleClickOutside() {
-      this.$emit("onClickOutside", this.isShown);
+      this.$emit("onClose", this.isShown);
     },
     handleGoHome() {
       if (this.$route.fullPath !== "/") {

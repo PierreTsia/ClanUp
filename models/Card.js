@@ -47,6 +47,9 @@ const CardSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
+  coverImg: {
+    type: String
+  },
   createdDate: {
     type: Date,
     default: Date.now

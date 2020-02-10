@@ -42,6 +42,7 @@ export const GET_BOARD_BY_ID = gql`
         cards {
           _id
           title
+          coverImg
           tags {
             _id
             label

@@ -138,7 +138,7 @@ export default {
   computed: { ...mapGetters(["me"]) },
   methods: {
     handleClickOutside() {
-      this.$emit("onClickOutside");
+      this.$emit("onClose");
     },
     setActiveBackground({ color, coverImg }) {
       this.activeBackground = { color, coverImg };

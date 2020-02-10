@@ -10,6 +10,7 @@ const card = gql`
     columnId: Column!
     position: Int!
     author: User
+    coverImg: String
     createdDate: String
     comments: [Comment]
   }
@@ -26,12 +27,13 @@ const card = gql`
 
   input CardInput {
     _id: ID
-    title: String!
+    title: String
     description: String
     boardId: ID!
     columnId: ID!
-    position: Int!
+    position: Int
     createdDate: String
+    coverImg: String
   }
   input CardOrderInput {
     _id: ID!

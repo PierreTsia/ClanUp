@@ -66,7 +66,7 @@ const userResolvers = {
       const user = await new User({
         ...userInput
       }).save();
-      return { token: createToken(user, process.env.SECRET, "1hr") };
+      return { token: createToken(user, process.env.SECRET, "12hr") };
     },
 
     signinUser: async (_, { email, password }, { User }) => {

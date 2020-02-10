@@ -5,6 +5,7 @@ export const UPSERT_CARD = gql`
       _id
       title
       description
+      coverImg
       position
       author {
         _id
@@ -29,6 +30,7 @@ export const CARD_BY_ID = gql`
       _id
       title
       position
+      coverImg
       description
       columnId {
         _id
