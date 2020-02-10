@@ -2,7 +2,8 @@
   <div class="coverImageMenu">
     <PresetImg
       v-if="!isUploadMode"
-      @onSelectPresetImg="imgUrl => $emit('onSelectImg', imgUrl)"
+      class="preset_img"
+      @onSelectPresetImg="handleSelectPresetImg"
       @onUploadImg="handleUploadMode"
     />
 
@@ -14,8 +15,20 @@
         @onClose="handleClose"
       >
         <div slot="imgPreview">
-          <v-img v-if="isUploaded" contain :src="imgSrc" :max-width="300" />
-          <v-img v-else contain :src="placeHolder" :max-width="300" />
+          <v-img
+            v-if="isUploaded"
+            contain
+            :src="imgSrc"
+            :max-width="300"
+            class="imagePreview"
+          />
+          <v-img
+            v-else
+            contain
+            :src="placeHolder"
+            :max-width="300"
+            class="imagePreview--placeholder"
+          />
         </div>
       </UploadImage>
     </v-list-item>
@@ -42,7 +55,7 @@ export default {
       return !!this.uploadedImage && this.uploadedImage.url;
     },
     imgSrc() {
-      return this.uploadedImage.url || "";
+      return (this.uploadedImage && this.uploadedImage.url) || "";
     }
   },
   methods: {
@@ -50,9 +63,15 @@ export default {
       this.$emit("onClose");
       this.uploadedImage = null;
     },
-
-    handleImageSaved({ url, public_id }) {
-      this.$emit("onImageSaved", { url, public_id });
+    handleSelectPresetImg(imgUrl) {
+      if (imgUrl) {
+        this.$emit("onSelectImg", imgUrl);
+      }
+    },
+    handleImageSaved({ url }) {
+      if (url) {
+        this.$emit("onImageSaved", { url });
+      }
     },
     handleUploadMode() {
       this.isUploadMode = true;
