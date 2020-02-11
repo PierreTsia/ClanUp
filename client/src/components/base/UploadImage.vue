@@ -4,21 +4,21 @@
     <v-flex class="d-flex justify-center align-end pb-5">
       <v-chip
         v-if="!uploading && isLocalFileSelected"
-        class="text-center my-2"
+        class="text-center my-2 uploaded_action_btn"
         filter
         color="success"
         label
-        @click="sendFileToCloudinary"
+        @click.native="sendFileToCloudinary"
       >
-        <v-icon size="16" class="mr-2œ  ">mdi-check</v-icon>
+        <v-icon size="16" class="mr-2">mdi-check</v-icon>
         Confirm </v-chip
       ><v-chip
         v-if="!uploading && !isLocalFileSelected"
-        class="text-center my-2"
+        class="text-center my-2 uploaded_action_btn"
         filter
         color="success"
         label
-        @click="selectFiles"
+        @click.native="selectFiles"
       >
         <div class="d-block mx-auto">
           <v-icon size="16">mdi-upload</v-icon>
