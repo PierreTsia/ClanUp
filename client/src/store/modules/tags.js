@@ -33,7 +33,7 @@ export const actions = {
         mutation: ADD_TAG_TO_CARD,
         variables: payload
       });
-      commit(types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS, data.addTagToCard.tags);
+      commit(types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS, data.addTagToCard);
     } catch (e) {
       console.warn(e);
     }
@@ -45,10 +45,7 @@ export const actions = {
         mutation: REMOVE_TAG_FROM_CARD,
         variables: payload
       });
-      commit(
-        types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS,
-        data.removeTagFromCard.tags
-      );
+      commit(types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS, data.removeTagFromCard);
     } catch (e) {
       console.warn(e);
     }

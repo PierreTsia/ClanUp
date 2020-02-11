@@ -93,9 +93,7 @@
                     :key="card._id"
                     @click.native="handleCardClick(card._id)"
                   >
-                    <v-card light class="card-container mb-2">
-                      <h4 class="pa-2">{{ card.title }}</h4>
-                    </v-card>
+                    <Card :card="card" />
                   </Draggable>
                 </Container>
                 <ListFooter
@@ -122,12 +120,13 @@ import { sortBy, flatMap } from "lodash";
 import { Container, Draggable } from "vue-smooth-dnd";
 import ListHeader from "@/components/board/ListHeader";
 import ListFooter from "@/components/board/ListFooter";
+import Card from "@/components/board/Card";
 
 import _ from "lodash";
 
 export default {
   name: "BoardView.vue",
-  components: { Container, Draggable, ListHeader, ListFooter },
+  components: { Container, Draggable, ListHeader, ListFooter, Card },
   watch: {
     boardId: {
       immediate: true,
@@ -400,7 +399,11 @@ export default {
         this.cardsByColumnsId[cardInput.columnId].findIndex(
           c => c._id === cardInput._id
         ),
-        cardInput
+        {
+          ...payload.item,
+          position: newPosition,
+          boardId: this.currentBoard._id
+        }
       );
       await this.upsertCard({ cardInput });
     },
@@ -450,7 +453,11 @@ export default {
       this.cardsByColumnsId[columnId] = this.insertNewCard(
         this.cardsByColumnsId[columnId],
         addedIndex,
-        cardInput
+        {
+          ...payload.item,
+          position: newPosition,
+          boardId: this.currentBoard._id
+        }
       );
 
       await this.upsertCard({ cardInput });

@@ -14,6 +14,11 @@ export const UPSERT_CARD = gql`
       columnId {
         _id
       }
+      tags {
+        _id
+        color
+        label
+      }
     }
   }
 `;

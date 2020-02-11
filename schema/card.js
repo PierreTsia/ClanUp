@@ -181,9 +181,9 @@ const cardResolvers = {
           { new: true }
         ).populate([
           { path: "author", model: "User" },
-          { path: "columnId", label: "Column" }
+          { path: "columnId", model: "Column" },
+          { path: "tags", model: "Tag" }
         ]);
-
         return updatedCard;
       } else {
         const newCard = await new Card({

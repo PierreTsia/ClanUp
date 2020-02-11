@@ -40,14 +40,6 @@ export default {
     areSettingsShown: false,
     dialog: true
   }),
-  watch: {
-    me: {
-      immediate: true,
-      handler(me) {
-        console.log(me);
-      }
-    }
-  },
   computed: {
     ...mapGetters([
       "me",

@@ -99,8 +99,21 @@ export const mutations = {
   },
 
   [types.GET_CURRENT_CARD_SUCCESS]: (state, card) => (state.currentCard = card),
-  [types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS]: (state, tags) =>
-    (state.currentCard = { ...state.currentCard, tags })
+  [types.ADD_OR_REMOVE_TAG_TO_CARD_SUCCESS]: (state, card) => {
+    const { tags } = card;
+    const boardCardIndex = state.currentBoardCards.findIndex(
+      c => c._id === card._id
+    );
+    if (boardCardIndex !== -1) {
+      const updatedCard = { ...state.currentBoardCards[boardCardIndex], tags };
+      state.currentBoardCards = [
+        ...state.currentBoardCards.slice(0, boardCardIndex),
+        updatedCard,
+        ...state.currentBoardCards.slice(boardCardIndex + 1)
+      ];
+    }
+    state.currentCard = { ...state.currentCard, tags };
+  }
 };
 
 export default {
