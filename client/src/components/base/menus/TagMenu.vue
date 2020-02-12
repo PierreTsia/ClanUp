@@ -9,7 +9,7 @@
           flat
           hide-details
           label="Find a tag"
-        ></v-text-field>
+        />
       </div>
       <ExistingTag
         v-for="(tag, index) in displayTags"
@@ -27,7 +27,7 @@
           filter
           color="success"
           label
-          @click="handleCreateNewClick"
+          @click.native="handleCreateNewClick"
         >
           <div class="d-block mx-auto">
             <v-icon size="16">mdi-plus-circle</v-icon>

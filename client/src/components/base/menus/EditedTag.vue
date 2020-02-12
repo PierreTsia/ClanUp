@@ -52,7 +52,6 @@ export default {
   },
   watch: {
     selectedColor: {
-      immediate: true,
       handler(color) {
         this.$emit("onColorChange", color);
       }

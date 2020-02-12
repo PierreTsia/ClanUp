@@ -6,7 +6,6 @@ import Vuex from "vuex";
 import Vuetify from "vuetify";
 import VueRouter from "vue-router";
 Vue.use(Vuetify);
-//import jest from "jest-mock";
 import { shallowMount, createLocalVue } from "@vue/test-utils";
 import jest from "jest-mock";
 

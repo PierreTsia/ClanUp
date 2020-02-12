@@ -3,6 +3,7 @@ import EditCardModal from "@/components/base/EditCardModal";
 import EditCardModalHeader from "@/components/base/editCardModal/EditCardModalHeader";
 import EditCardModalMenu from "@/components/base/editCardModal/EditCardModalMenu";
 import TagMenu from "@/components/base/menus/TagMenu";
+import CoverImageMenu from "@/components/base/menus/CoverImageMenu";
 import createStub from "./support/createStubWithProps";
 import jest from "jest-mock";
 import Vue from "vue";
@@ -26,6 +27,7 @@ describe("EditCardModal.vue", () => {
       _id: "1",
       title: "test",
       position: 42,
+      coverImg: null,
       columnId: { _id: "columnId", title: "column-test" }
     }
   };
@@ -147,9 +149,11 @@ describe("EditCardModal.vue", () => {
 
       //then it should trigger database mutation with args / should not
       if (shouldBeCalled) {
+        const { _id, position } = modalProps.card;
         expect(wrapper.vm.upsertCard).toHaveBeenCalledWith({
           cardInput: {
-            ...modalProps.card,
+            _id,
+            position,
             columnId: modalProps.card.columnId._id,
             boardId: wrapper.vm.$store.getters.currentBoard._id,
             title: titleInput
@@ -229,6 +233,29 @@ describe("EditCardModal.vue", () => {
       expect(wrapper.find(TagMenu).exists()).toBe(shouldShow);
     });
   });
+  [
+    ["add_tag", false], //
+    ["add_coverImg", true]
+  ].forEach(([menuItemId, shouldShow]) => {
+    it(`should${
+      shouldShow ? " " : " not "
+    }show the coverImg menu if aciveItemId is ${
+      shouldShow ? menuItemId : "another menu item"
+    }`, async () => {
+      const wrapper = shallowMount(EditCardModal, {
+        localVue,
+        store: getStore(),
+        stubs: { CoverImgMenuStub: createStub(CoverImageMenu) },
+        propsData: {
+          modalProps
+        }
+      });
+
+      wrapper.setData({ activeMenuId: menuItemId });
+      await wrapper.vm.$nextTick();
+      expect(wrapper.find(CoverImageMenu).exists()).toBe(shouldShow);
+    });
+  });
 
   [
     ["0000", "removeTagFromCard", true], //
@@ -289,6 +316,32 @@ describe("EditCardModal.vue", () => {
         expect(wrapper.vm.upsertTag).toHaveBeenCalled();
       } else {
         expect(wrapper.vm.upsertTag).not.toHaveBeenCalled();
+      }
+    });
+  });
+
+  it("should upsert card if coverImage is modified", async () => {
+    const wrapper = shallowMount(EditCardModal, {
+      localVue,
+      store: getStore(),
+      stubs: { CoverImg: createStub(CoverImageMenu) },
+      propsData: {
+        modalProps
+      }
+    });
+    jest.spyOn(wrapper.vm, "upsertCard");
+    wrapper.setData({ activeMenuId: "add_coverImg" });
+    await wrapper.vm.$nextTick();
+
+    const coverImg = wrapper.find(CoverImageMenu);
+
+    coverImg.vm.$emit("onSelectImg", "test-url");
+    expect(wrapper.vm.upsertCard).toHaveBeenCalledWith({
+      cardInput: {
+        _id: "1",
+        boardId: "boardId",
+        columnId: "columnId",
+        coverImg: "test-url"
       }
     });
   });
