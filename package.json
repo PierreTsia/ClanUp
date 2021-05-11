@@ -9,7 +9,7 @@
     "dotenv": "^6.2.0",
     "graphql": "^0.13.2",
     "jsonwebtoken": "^8.3.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "md5": "^2.2.1",
     "mongoose": "^5.2.6",
     "prettier": "^1.17.1"
