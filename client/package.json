@@ -22,7 +22,7 @@
     "vue-apollo": "^3.0.0-rc.4",
     "vue-router": "^3.0.3",
     "vue-smooth-dnd": "^0.8.0",
-    "vuetify": "^2.0.0",
+    "vuetify": "^2.6.10",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
